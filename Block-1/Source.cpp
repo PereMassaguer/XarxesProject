@@ -6,7 +6,7 @@
 
 int main()
 {
-	sf::IpAddress ip = "192.168.23.209";//sf::IpAddress::getLocalAddress();
+	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
 	sf::TcpSocket socket;
 	char connectionType, mode;
 	char buffer[2000];

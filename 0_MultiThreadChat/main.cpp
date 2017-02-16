@@ -1,9 +1,13 @@
-#include <SFML\Graphics.hpp>
-#include <string>
 #include <iostream>
+#include <SFML\Graphics.hpp>
+#include <SFML\Network.hpp>
+#include <string>
+#include <cstring>
+#include <thread>
 #include <vector>
 
 #define MAX_MENSAJES 30
+
 
 
 int main()
@@ -16,10 +20,7 @@ int main()
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
 
 	sf::Font font;
-	if (!font.loadFromFile("courbd.ttf"))
-	{
-		std::cout << "Can't load the font file" << std::endl;
-	}
+	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
 
 	sf::String mensaje = " >";
 
@@ -37,8 +38,38 @@ int main()
 	separator.setFillColor(sf::Color(200, 200, 200, 255));
 	separator.setPosition(0, 550);
 	
-	while (window.isOpen())
-	{
+
+	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
+	sf::TcpSocket socket;
+	char connectionType, mode;
+	char buffer[2000];
+	std::size_t received;
+	std::string responseText = "Connected to: ";
+
+	std::cout << "Enter (s) for Server, Enter (c) for Client: ";
+	std::cin >> connectionType;
+
+	if (connectionType == 's') {
+		sf::TcpListener listener;
+		listener.listen(5000);
+		listener.accept(socket);
+		responseText += "Server";
+		mode = 's';
+		listener.close();
+	}
+	else if (connectionType == 'c') {
+		socket.connect(ip, 5000);
+		responseText += "Client";
+		mode = 'r';
+	}
+
+	socket.send(responseText.c_str(), responseText.length() + 1);
+	socket.receive(buffer, sizeof(buffer), received);
+
+	std::cout << buffer << std::endl;
+
+	bool done = false;
+	while (window.isOpen() && !done) {		
 		sf::Event evento;
 		while (window.pollEvent(evento))
 		{
@@ -50,13 +81,12 @@ int main()
 			case sf::Event::KeyPressed:
 				if (evento.key.code == sf::Keyboard::Escape)
 					window.close();
-				else if (evento.key.code == sf::Keyboard::Return)
-				{
+				else if (evento.key.code == sf::Keyboard::Return) {
 					aMensajes.push_back(mensaje);
-					if (aMensajes.size() > 25)
-					{
-						aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
-					}
+					std::string aux;
+					std::copy(mensaje.begin(), mensaje.end(), aux);
+					socket.send(aux.c_str(), aux.length() + 1);
+					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					mensaje = ">";
 				}
 				break;
@@ -68,9 +98,10 @@ int main()
 				break;
 			}
 		}
+
+		//socket.receive(buffer, sizeof(buffer), received);
 		window.draw(separator);
-		for (size_t i = 0; i < aMensajes.size(); i++)
-		{
+		for (size_t i = 0; i < aMensajes.size(); i++) {
 			std::string chatting = aMensajes[i];
 			chattingText.setPosition(sf::Vector2f(0, 20 * i));
 			chattingText.setString(chatting);
@@ -84,5 +115,6 @@ int main()
 		window.display();
 		window.clear();
 	}
-	
+	socket.disconnect();
+	return 0;
 }
