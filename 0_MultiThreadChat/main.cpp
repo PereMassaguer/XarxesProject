@@ -8,6 +8,13 @@
 
 #define MAX_MENSAJES 30
 
+void SocketCommunication(sf::TcpSocket s, char &buffer) {
+	std::size_t received;
+	while (1) {
+		s.receive(&buffer, sizeof(buffer), received);
+	}
+}
+
 
 
 int main()
@@ -40,7 +47,7 @@ int main()
 	
 
 	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
-	sf::TcpSocket socket;
+	sf::TcpSocket socketS, socketR;
 	char connectionType, mode;
 	char buffer[2000];
 	std::size_t received;
@@ -49,25 +56,52 @@ int main()
 	std::cout << "Enter (s) for Server, Enter (c) for Client: ";
 	std::cin >> connectionType;
 
+	
+
 	if (connectionType == 's') {
-		sf::TcpListener listener;
-		listener.listen(5000);
-		listener.accept(socket);
+		sf::TcpListener listenerS, listenerR;
+		listenerS.listen(5000);
+		if (listenerS.accept(socketS) != sf::Socket::Done) {
+			std::cout << "accept socket error" << std::endl;
+			return -1;
+		}
+		listenerS.close();
+
+		listenerR.listen(5001);
+		if (listenerR.accept(socketR) != sf::Socket::Done) {
+			std::cout << "accept socket error" << std::endl;
+			return -1;
+		}
+		listenerR.close();
+
+		sf::Thread getServerMessage(SocketCommunication, socketR, buffer);
+		getServerMessage.launch();
+
 		responseText += "Server";
 		mode = 's';
-		listener.close();
 	}
 	else if (connectionType == 'c') {
-		socket.connect(ip, 5000);
+		if (socketS.connect(ip, 5000) != sf::Socket::Done) {
+			std::cout << "connect socket error" << std::endl;
+			return -1;
+		}
+
+		if (socketR.connect(ip, 5001) != sf::Socket::Done) {
+			std::cout << "connect socket error" << std::endl;
+			return -1;
+		}
+
+		sf::Thread getClientMessage(SocketCommunication, socketR, buffer);
+		getClientMessage.launch();
+
 		responseText += "Client";
 		mode = 'r';
 	}
 
-	socket.send(responseText.c_str(), responseText.length() + 1);
-	socket.receive(buffer, sizeof(buffer), received);
-
+	if (socketS.send(responseText.c_str(), responseText.length() + 1) != sf::Socket::Done) {}
+	if (socketS.receive(buffer, sizeof(buffer), received) == sf::Socket::Done) {}
 	std::cout << buffer << std::endl;
-
+	
 	bool done = false;
 	while (window.isOpen() && !done) {		
 		sf::Event evento;
@@ -83,9 +117,11 @@ int main()
 					window.close();
 				else if (evento.key.code == sf::Keyboard::Return) {
 					aMensajes.push_back(mensaje);
-					std::string aux;
-					std::copy(mensaje.begin(), mensaje.end(), aux);
-					socket.send(aux.c_str(), aux.length() + 1);
+					sf::Socket::Status status = socketS.send(std::string(mensaje).c_str(), std::string(mensaje).length() + 1);
+					if (status != sf::Socket::Done) {
+						std::cout << "send message error" << std::endl;
+						return -1;
+					}
 					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					mensaje = ">";
 				}
@@ -99,7 +135,6 @@ int main()
 			}
 		}
 
-		//socket.receive(buffer, sizeof(buffer), received);
 		window.draw(separator);
 		for (size_t i = 0; i < aMensajes.size(); i++) {
 			std::string chatting = aMensajes[i];
@@ -115,6 +150,7 @@ int main()
 		window.display();
 		window.clear();
 	}
-	socket.disconnect();
+	socketS.disconnect();
+	socketR.disconnect();
 	return 0;
 }
