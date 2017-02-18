@@ -3,26 +3,22 @@
 #include <SFML\Network.hpp>
 #include <string>
 #include <cstring>
-#include <thread>
 #include <vector>
+#include "SocketManager.h"
 
 #define MAX_MENSAJES 30
 
-void SocketCommunication(sf::TcpSocket s, char &buffer) {
-	std::size_t received;
-	while (1) {
-		s.receive(&buffer, sizeof(buffer), received);
-	}
-}
+
 
 
 
 int main()
 {
+
 	std::vector<std::string> aMensajes;
 	
 	sf::Vector2i screenDimensions(800, 600);
-
+	
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
 
@@ -46,10 +42,7 @@ int main()
 	separator.setPosition(0, 550);
 	
 
-	sf::IpAddress ip = sf::IpAddress::getLocalAddress();
-	sf::TcpSocket socketS, socketR;
 	char connectionType, mode;
-	char buffer[2000];
 	std::size_t received;
 	std::string responseText = "Connected to: ";
 
@@ -57,50 +50,16 @@ int main()
 	std::cin >> connectionType;
 
 	
-
+	SocketManager sm;
 	if (connectionType == 's') {
-		sf::TcpListener listenerS, listenerR;
-		listenerS.listen(5000);
-		if (listenerS.accept(socketS) != sf::Socket::Done) {
-			std::cout << "accept socket error" << std::endl;
-			return -1;
-		}
-		listenerS.close();
-
-		listenerR.listen(5001);
-		if (listenerR.accept(socketR) != sf::Socket::Done) {
-			std::cout << "accept socket error" << std::endl;
-			return -1;
-		}
-		listenerR.close();
-
-		sf::Thread getServerMessage(SocketCommunication, socketR, buffer);
-		getServerMessage.launch();
-
 		responseText += "Server";
 		mode = 's';
 	}
 	else if (connectionType == 'c') {
-		if (socketS.connect(ip, 5000) != sf::Socket::Done) {
-			std::cout << "connect socket error" << std::endl;
-			return -1;
-		}
-
-		if (socketR.connect(ip, 5001) != sf::Socket::Done) {
-			std::cout << "connect socket error" << std::endl;
-			return -1;
-		}
-
-		sf::Thread getClientMessage(SocketCommunication, socketR, buffer);
-		getClientMessage.launch();
-
 		responseText += "Client";
 		mode = 'r';
 	}
-
-	if (socketS.send(responseText.c_str(), responseText.length() + 1) != sf::Socket::Done) {}
-	if (socketS.receive(buffer, sizeof(buffer), received) == sf::Socket::Done) {}
-	std::cout << buffer << std::endl;
+	sm.Init(mode);
 	
 	bool done = false;
 	while (window.isOpen() && !done) {		
@@ -116,12 +75,11 @@ int main()
 				if (evento.key.code == sf::Keyboard::Escape)
 					window.close();
 				else if (evento.key.code == sf::Keyboard::Return) {
+					
+					if (mode == 's') mensaje = "Server says: " + mensaje;
+					else if (mode == 'r') mensaje = "Client says" + mensaje;
 					aMensajes.push_back(mensaje);
-					sf::Socket::Status status = socketS.send(std::string(mensaje).c_str(), std::string(mensaje).length() + 1);
-					if (status != sf::Socket::Done) {
-						std::cout << "send message error" << std::endl;
-						return -1;
-					}
+					sm.SendMessage(mensaje);
 					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					mensaje = ">";
 				}
@@ -150,7 +108,5 @@ int main()
 		window.display();
 		window.clear();
 	}
-	socketS.disconnect();
-	socketR.disconnect();
 	return 0;
 }
