@@ -17,38 +17,56 @@ SocketManager::~SocketManager()
 void SocketManager::ServerInit()
 {
 	sf::TcpListener listener;
-	listener.listen(5000);
-	if (listener.accept(socketS) != sf::Socket::Done)
-		std::cout << "accept socket error" << std::endl;
+	sf::Socket::Status status = listener.listen(CONNECT_PORT);
+	if (status != sf::Socket::Done) {
+		std::cout << "Connection failed on port " << (int)CONNECT_PORT << std::endl;
+		return;
+	}
+	listener.setBlocking(false);
 
-	if (listener.accept(socketR) != sf::Socket::Done)
-		std::cout << "accept socket error" << std::endl;
+	std::time_t initTime = time(NULL);
+	while (initTime + 5 > time(NULL)) {
+		sf::Socket::Status check;
+		check = listener.accept(socket);
+	}
 }
 
 void SocketManager::ClientInit()
 {
 	sf::Socket::Status status;
 	do {
-		status = socketR.connect(ip, 5000, sf::seconds(0.5f));
+		status = socket.connect(ip, 5000, sf::seconds(0.5f));
 	} while (status != sf::Socket::Done);
-
-	do {
-		status = socketS.connect(ip, 5000, sf::seconds(0.5f));
-	} while (status != sf::Socket::Done);
-
 }
 
 void SocketManager::SocketReceive() {
-	std::size_t received;
+	std::size_t bytesReceived;
 
 	while (1) {
-		socketR.receive(&buffer, sizeof(buffer), received);
+		sf::Socket::Status status = socket.receive(&buffer, sizeof(buffer), bytesReceived);
+
+		if (status == sf::Socket::NotReady) continue;
+		else if (status == sf::Socket::Done) {
+			std::string string = buffer;
+			string.substr(0, bytesReceived);
+			/*
+			if (string == "/hello") {
+
+			}
+			else if (string == "/bye") {
+
+			}
+			else {
+
+			}*/
+		}
+		else if (status == sf::Socket::Disconnected) break;
 	}
 }
 
 void SocketManager::SendMessage(std::string message)
 {
-	socketS.send(message.c_str(), message.length() + 1);
+	socket.send(message.c_str(), message.length() + 1);
 }
 
 char* SocketManager::getBuffer()
@@ -71,6 +89,5 @@ void SocketManager::Init(char m)
 }
 
 void SocketManager::Disconnect() {
-	socketS.disconnect();
-	socketR.disconnect();
+	socket.disconnect();
 }

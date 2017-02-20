@@ -3,17 +3,25 @@
 #include <iostream>
 #include <thread>
 
+#define CONNECT_PORT 5000
+
+#define SM SocketManager::Instance()
 class SocketManager
 {
 	sf::IpAddress ip;
 	char buffer[2000];
-	sf::TcpSocket socketS, socketR;
+	sf::TcpSocket socket;
 	char mode;
 
 public:
 	SocketManager();
 	~SocketManager();
-	
+
+	inline static SocketManager &Instance() {
+		static SocketManager socketManager;
+		return socketManager;
+	}
+
 	void ServerInit();
 	void ClientInit();
 	void SocketReceive();

@@ -4,6 +4,8 @@
 #include <string>
 #include <cstring>
 #include <vector>
+
+#include "GraphicsManager.h"
 #include "SocketManager.h"
 
 #define MAX_MENSAJES 30
@@ -14,23 +16,23 @@
 
 int main()
 {
-
 	std::vector<std::string> aMensajes;
-	
+
 	sf::Vector2i screenDimensions(800, 600);
-	
+
 	sf::RenderWindow window;
+	sf::String mensaje;
+	mensaje = " >";
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
 
 	sf::Font font;
 	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
 
-	sf::String mensaje = " >";
 
 	sf::Text chattingText(mensaje, font, 14);
 	chattingText.setFillColor(sf::Color(0, 160, 0));
 	chattingText.setStyle(sf::Text::Bold);
-	
+
 
 	sf::Text text(mensaje, font, 14);
 	text.setFillColor(sf::Color(0, 160, 0));
@@ -40,7 +42,6 @@ int main()
 	sf::RectangleShape separator(sf::Vector2f(800, 5));
 	separator.setFillColor(sf::Color(200, 200, 200, 255));
 	separator.setPosition(0, 550);
-	
 
 	char connectionType, mode;
 	std::size_t received;
@@ -49,8 +50,6 @@ int main()
 	std::cout << "Enter (s) for Server, Enter (c) for Client: ";
 	std::cin >> connectionType;
 
-	
-	SocketManager sm;
 	if (connectionType == 's') {
 		responseText += "Server";
 		mode = 's';
@@ -59,9 +58,9 @@ int main()
 		responseText += "Client";
 		mode = 'r';
 	}
-	sm.Init(mode);
+	SM.Init(mode);
 
-	sf::Thread getClientMessage(&SocketManager::SocketReceive, &sm);
+	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 
 	bool done = false;
@@ -82,9 +81,9 @@ int main()
 					if (mode == 's') mensaje = "Server says:" + mensaje;
 					else if (mode == 'r') mensaje = "Client says:" + mensaje;
 					aMensajes.push_back(mensaje);
-					sm.SendMessage(mensaje);
+					SM.SendMessage(mensaje);
 					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
-					mensaje = ">";
+					mensaje = " >";
 				}
 				break;
 			case sf::Event::TextEntered:
@@ -95,10 +94,10 @@ int main()
 				break;
 			}
 		}
-		if (*(sm.getBuffer()) != '\0') {
-			std::cout << *(sm.getBuffer()) << std::endl;
-			aMensajes.push_back(sm.getBuffer());
-			sm.EraseBuffer();
+		if (*(SM.getBuffer()) != '\0') {
+			std::cout << *(SM.getBuffer()) << std::endl;
+			aMensajes.push_back(SM.getBuffer());
+			SM.EraseBuffer();
 		}
 
 
@@ -117,6 +116,6 @@ int main()
 		window.display();
 		window.clear();
 	}
-	sm.Disconnect();
+	SM.Disconnect();
 	return 0;
 }
