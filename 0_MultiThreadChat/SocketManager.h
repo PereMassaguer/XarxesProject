@@ -3,7 +3,6 @@
 #include <iostream>
 #include <thread>
 
-//#define SM SocketManager::Instance()
 class SocketManager
 {
 	sf::IpAddress ip;
@@ -14,10 +13,6 @@ class SocketManager
 public:
 	SocketManager();
 	~SocketManager();
-	/*inline static SocketManager &Instance() {
-		static SocketManager r;
-		return r;
-	}*/
 	
 	void ServerInit();
 	void ClientInit();
@@ -25,6 +20,8 @@ public:
 	void SendMessage(std::string message);
 
 	char* getBuffer();
+	void EraseBuffer();
 
 	void Init(char m);
+	void Disconnect();
 };

@@ -60,7 +60,10 @@ int main()
 		mode = 'r';
 	}
 	sm.Init(mode);
-	
+
+	sf::Thread getClientMessage(&SocketManager::SocketReceive, &sm);
+	getClientMessage.launch();
+
 	bool done = false;
 	while (window.isOpen() && !done) {		
 		sf::Event evento;
@@ -76,8 +79,8 @@ int main()
 					window.close();
 				else if (evento.key.code == sf::Keyboard::Return) {
 					
-					if (mode == 's') mensaje = "Server says: " + mensaje;
-					else if (mode == 'r') mensaje = "Client says" + mensaje;
+					if (mode == 's') mensaje = "Server says:" + mensaje;
+					else if (mode == 'r') mensaje = "Client says:" + mensaje;
 					aMensajes.push_back(mensaje);
 					sm.SendMessage(mensaje);
 					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
@@ -92,6 +95,12 @@ int main()
 				break;
 			}
 		}
+		if (*(sm.getBuffer()) != '\0') {
+			std::cout << *(sm.getBuffer()) << std::endl;
+			aMensajes.push_back(sm.getBuffer());
+			sm.EraseBuffer();
+		}
+
 
 		window.draw(separator);
 		for (size_t i = 0; i < aMensajes.size(); i++) {
@@ -108,5 +117,6 @@ int main()
 		window.display();
 		window.clear();
 	}
+	sm.Disconnect();
 	return 0;
 }
