@@ -5,7 +5,7 @@
 
 
 
-//S#define GM GraphicsManager::Instance()
+#define GM GraphicsManager::Instance()
 class GraphicsManager
 {
 	sf::RenderWindow window;

@@ -37,6 +37,7 @@ void SocketManager::ClientInit()
 	do {
 		status = socket.connect(ip, 5000, sf::seconds(0.5f));
 	} while (status != sf::Socket::Done);
+	socket.setBlocking(false);
 }
 
 void SocketManager::SocketReceive() {
@@ -49,16 +50,6 @@ void SocketManager::SocketReceive() {
 		else if (status == sf::Socket::Done) {
 			std::string string = buffer;
 			string.substr(0, bytesReceived);
-			/*
-			if (string == "/hello") {
-
-			}
-			else if (string == "/bye") {
-
-			}
-			else {
-
-			}*/
 		}
 		else if (status == sf::Socket::Disconnected) break;
 	}
