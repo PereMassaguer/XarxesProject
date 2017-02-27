@@ -19,11 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5CA8C3B4-7300-4CFC-9792-EFF4741793F0}</ProjectGuid>
+    <ProjectGuid>{B63BEED3-DBC4-4902-B502-178DAA387357}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My0_MultiThreadChat</RootNamespace>
+    <RootNamespace>Chat_Client</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>0_MultiThreadChat</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

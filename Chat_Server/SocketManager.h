@@ -22,13 +22,12 @@ public:
 		return socketManager;
 	}
 
-	void ClientInit();
+	void ServerInit();
 	void SocketReceive();
 	void SendMessage(std::string message);
 
 	char* getBuffer();
 	void EraseBuffer();
 
-	void Init(char m);
 	void Disconnect();
 };

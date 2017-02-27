@@ -11,7 +11,6 @@ class SocketManager
 	sf::IpAddress ip;
 	char buffer[2000];
 	sf::TcpSocket socket;
-	char mode;
 
 public:
 	SocketManager();
@@ -22,6 +21,7 @@ public:
 		return socketManager;
 	}
 
+
 	void ClientInit();
 	void SocketReceive();
 	void SendMessage(std::string message);
@@ -29,6 +29,5 @@ public:
 	char* getBuffer();
 	void EraseBuffer();
 
-	void Init(char m);
 	void Disconnect();
 };

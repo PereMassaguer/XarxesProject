@@ -31,13 +31,6 @@ void SocketManager::ServerInit()
 	}
 }
 
-void SocketManager::ClientInit()
-{
-	sf::Socket::Status status;
-	do {
-		status = socket.connect(ip, 5000, sf::seconds(0.5f));
-	} while (status != sf::Socket::Done);
-}
 
 void SocketManager::SocketReceive() {
 	std::size_t bytesReceived;
@@ -72,15 +65,6 @@ char* SocketManager::getBuffer()
 void SocketManager::EraseBuffer() {
 	char t[2] = "";
 	strcpy_s(buffer, t);
-}
-
-void SocketManager::Init(char m)
-{
-	mode = m;
-	if (mode == 's')
-		ServerInit();
-	else if (mode == 'r')
-		ClientInit();
 }
 
 void SocketManager::Disconnect() {

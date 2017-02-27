@@ -14,23 +14,6 @@ SocketManager::~SocketManager()
 }
 
 
-void SocketManager::ServerInit()
-{
-	sf::TcpListener listener;
-	sf::Socket::Status status = listener.listen(CONNECT_PORT);
-	if (status != sf::Socket::Done) {
-		std::cout << "Connection failed on port " << (int)CONNECT_PORT << std::endl;
-		return;
-	}
-	listener.setBlocking(false);
-
-	std::time_t initTime = time(NULL);
-	while (initTime + 5 > time(NULL)) {
-		sf::Socket::Status check;
-		check = listener.accept(socket);
-	}
-}
-
 void SocketManager::ClientInit()
 {
 	sf::Socket::Status status;
@@ -59,9 +42,6 @@ void SocketManager::SendMessage(std::string message)
 {
 	size_t sentBytes;
 	socket.send(message.c_str(), message.length() + 1, sentBytes);
-	if (sizeof(message.c_str()) < sentBytes) {
-
-	}
 }
 
 char* SocketManager::getBuffer()
@@ -72,15 +52,6 @@ char* SocketManager::getBuffer()
 void SocketManager::EraseBuffer() {
 	char t[2] = "";
 	strcpy_s(buffer, t);
-}
-
-void SocketManager::Init(char m)
-{
-	mode = m;
-	if (mode == 's')
-		ServerInit();
-	else if (mode == 'r')
-		ClientInit();
 }
 
 void SocketManager::Disconnect() {
