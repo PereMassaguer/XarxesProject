@@ -63,7 +63,6 @@ int main()
 				else if (evento.key.code == sf::Keyboard::Return) {
 
 					mensaje = "Client says:" + mensaje;
-					aMensajes.push_back(mensaje);
 					SM.SendMessage(mensaje);
 					if (aMensajes.size() > 25) aMensajes.erase(aMensajes.begin(), aMensajes.begin() + 1);
 					mensaje = " >";

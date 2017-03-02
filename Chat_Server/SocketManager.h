@@ -11,6 +11,7 @@ class SocketManager
 	sf::IpAddress ip;
 	char buffer[2000];
 
+	sf::TcpListener listener;
 	std::vector<sf::TcpSocket*> clientSockets;
 	sf::SocketSelector selector;
 
