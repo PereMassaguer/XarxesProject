@@ -10,8 +10,9 @@ class SocketManager
 {
 	sf::IpAddress ip;
 	char buffer[2000];
-	sf::TcpSocket socket;
-	char mode;
+
+	std::vector<sf::TcpSocket*> clientSockets;
+	sf::SocketSelector selector;
 
 public:
 	SocketManager();

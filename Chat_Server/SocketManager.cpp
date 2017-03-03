@@ -24,11 +24,14 @@ void SocketManager::ServerInit()
 	}
 	listener.setBlocking(false);
 
+
+	sf::TcpSocket socket;
 	std::time_t initTime = time(NULL);
 	while (initTime + 5 > time(NULL)) {
 		sf::Socket::Status check;
 		check = listener.accept(socket);
 	}
+	clientSockets.push_back(&socket);
 }
 
 
