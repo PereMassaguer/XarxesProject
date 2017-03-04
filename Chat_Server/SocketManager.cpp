@@ -16,12 +16,12 @@ SocketManager::~SocketManager()
 
 void SocketManager::ServerInit()
 {
+	std::cout << "Server ON" << std::endl;
 	sf::Socket::Status status = listener.listen(CONNECT_PORT);
 	if (status != sf::Socket::Done) {
 		std::cout << "Connection failed on port " << (int)CONNECT_PORT << std::endl;
 		return;
 	}
-	listener.setBlocking(false);
 	selector.add(listener);
 }
 
