@@ -11,6 +11,8 @@ SocketManager::SocketManager()
 
 SocketManager::~SocketManager()
 {
+	for (auto it : clientSockets) it->disconnect();
+	clientSockets.clear();
 }
 
 
@@ -23,6 +25,7 @@ void SocketManager::ServerInit()
 		return;
 	}
 	selector.add(listener);
+	SayConnections();
 }
 
 
@@ -36,20 +39,32 @@ void SocketManager::SocketReceive() {
 				if (listener.accept(*client) == sf::Socket::Done) {
 					clientSockets.push_back(client);
 					selector.add(*client);
+					std::cout << "New client connected: "; SayConnections();
 				}
 				else { 
 					delete client; 
 				}
 			}
 			else {
-				for (auto it : clientSockets) {
-					if (selector.isReady(*it)) {
-						it->receive(&buffer, sizeof(buffer), bytesReceived);
-						SM.SendMessage(buffer);
+				std::vector<int> eraseList;
+				for (int i = 0; i < clientSockets.size();i++) {
+					if (selector.isReady(*clientSockets[i])) {
+						sf::TcpSocket::Status st;
+						st = clientSockets[i]->receive(&buffer, sizeof(buffer), bytesReceived);
+						if (st == sf::TcpSocket::Disconnected) {
+							std::cout << "Client disconnected, ";
+							eraseList.push_back(i);
+						}
+						SendMessage(buffer);
 					}
+				}
+				for (auto it : eraseList) {
+					clientSockets.erase(clientSockets.begin() + it);
+					SayConnections();
 				}
 			}
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }
 
@@ -72,6 +87,8 @@ void SocketManager::EraseBuffer() {
 	strcpy_s(buffer, t);
 }
 
-void SocketManager::Disconnect() {
-	for (auto it : clientSockets) it->disconnect();
+
+void SocketManager::SayConnections()
+{
+	std::cout << clientSockets.size() << " clients connected now" << std::endl;
 }

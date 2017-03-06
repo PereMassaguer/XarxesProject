@@ -11,9 +11,6 @@
 #define MAX_MENSAJES 30
 
 
-
-
-
 int main()
 {
 	std::vector<std::string> aMensajes;
@@ -23,7 +20,7 @@ int main()
 	sf::RenderWindow window;
 	sf::String mensaje;
 	mensaje = " >";
-	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
+	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Server");
 
 	sf::Font font;
 	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
@@ -74,13 +71,13 @@ int main()
 			case sf::Event::TextEntered:
 				if (evento.text.unicode >= 32 && evento.text.unicode <= 126)
 					mensaje += (char)evento.text.unicode;
-				else if (evento.text.unicode == 8 && mensaje.getSize() > 0)
+				else if (evento.text.unicode == 8 && mensaje.getSize() > 2)
 					mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
 				break;
 			}
 		}
 		if (*(SM.getBuffer()) != '\0') {
-			std::cout << *(SM.getBuffer()) << std::endl;
+			//std::cout << *(SM.getBuffer()) << std::endl;
 			aMensajes.push_back(SM.getBuffer());
 			SM.EraseBuffer();
 		}
@@ -101,6 +98,7 @@ int main()
 		window.display();
 		window.clear();
 	}
-	SM.Disconnect();
+	getClientMessage.terminate();
+
 	return 0;
 }

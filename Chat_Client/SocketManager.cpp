@@ -11,23 +11,23 @@ SocketManager::SocketManager()
 
 SocketManager::~SocketManager()
 {
+	socket.disconnect();
 }
 
 
 void SocketManager::ClientInit()
 {
-	sf::Socket::Status status;
+	sf::Socket::Status st;
 	do {
-		status = socket.connect(ip, 5000, sf::seconds(0.5f));
-	} while (status != sf::Socket::Done);
+		st = socket.connect(ip, 5000, sf::seconds(0.5f));
+	} while (st != sf::Socket::Done);
 }
 
 void SocketManager::SocketReceive() {
 	std::size_t bytesReceived;
-	socket.setBlocking(false);
-
+	
 	while (1) {
-		sf::Socket::Status status = socket.receive(&buffer, sizeof(buffer), bytesReceived);
+		status = socket.receive(&buffer, sizeof(buffer), bytesReceived);
 
 		if (status == sf::Socket::NotReady) continue;
 		else if (status == sf::Socket::Done) {
@@ -56,4 +56,8 @@ void SocketManager::EraseBuffer() {
 
 void SocketManager::Disconnect() {
 	socket.disconnect();
+}
+
+sf::TcpSocket::Status SocketManager::GetConnectionStatus() {
+	return status;
 }

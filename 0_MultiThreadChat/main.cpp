@@ -63,6 +63,7 @@ int main()
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 
+
 	bool done = false;
 	while (window.isOpen() && !done) {		
 		sf::Event evento;
@@ -117,5 +118,6 @@ int main()
 		window.clear();
 	}
 	SM.Disconnect();
+
 	return 0;
 }

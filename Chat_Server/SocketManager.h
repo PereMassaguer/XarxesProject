@@ -31,5 +31,5 @@ public:
 	char* getBuffer();
 	void EraseBuffer();
 
-	void Disconnect();
+	void SayConnections();
 };

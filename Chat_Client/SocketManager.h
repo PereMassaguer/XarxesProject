@@ -11,6 +11,7 @@ class SocketManager
 	sf::IpAddress ip;
 	char buffer[2000];
 	sf::TcpSocket socket;
+	sf::Socket::Status status;
 
 public:
 	SocketManager();
@@ -29,5 +30,6 @@ public:
 	char* getBuffer();
 	void EraseBuffer();
 
+	sf::TcpSocket::Status GetConnectionStatus();
 	void Disconnect();
 };
