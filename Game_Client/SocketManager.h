@@ -9,11 +9,9 @@
 class SocketManager
 {
 	sf::IpAddress ip;
-	char buffer[2][2000];
-
-	sf::TcpListener listener;
-	std::vector<sf::TcpSocket*> clientSockets;
-	sf::SocketSelector selector;
+	char buffer[2000];
+	sf::TcpSocket socket;
+	sf::Socket::Status status;
 
 public:
 	SocketManager();
@@ -24,12 +22,14 @@ public:
 		return socketManager;
 	}
 
-	void ServerInit();
+
+	void ClientInit();
 	void SocketReceive();
 	void SendMessage(std::string message);
 
-	char* getBuffer(int i);
-	void EraseBuffer(int i);
+	char* getBuffer();
+	void EraseBuffer();
 
-	void SayConnections();
+	sf::TcpSocket::Status GetConnectionStatus();
+	void Disconnect();
 };

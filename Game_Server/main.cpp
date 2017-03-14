@@ -45,7 +45,7 @@ int main()
 		case USER_CONNECTION:
 
 			break;
-			
+
 		case NAME_INPUT:
 			//Set del nombre
 			for (int i = 0; i < 2; i++) {

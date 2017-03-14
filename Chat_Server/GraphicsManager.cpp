@@ -5,7 +5,6 @@ GraphicsManager::GraphicsManager()
 {
 	sf::Vector2i screenDimensions(800, 600);
 
-	mensaje = " >";
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Chat");
 
 	sf::Font font;
