@@ -56,7 +56,7 @@ void SocketManager::SocketReceive() {
 							std::cout << "Client disconnected, ";
 							eraseList.push_back(i);
 						}
-						SendMessage(buffer[i]);
+						//SendMessage(buffer[i]);
 					}
 				}
 				for (auto it : eraseList) {
@@ -76,6 +76,13 @@ void SocketManager::SendMessage(std::string message)
 	for (auto it : clientSockets) {
 		it->send(message.c_str(), message.length() + 1, sentBytes);
 	}
+}
+
+void SocketManager::SendMessage(std::string message, int i)
+{
+	size_t sentBytes;
+	std::cout << "Sent: " << message << std::endl;
+	clientSockets[i]->send(message.c_str(), message.length() + 1, sentBytes);
 }
 
 char* SocketManager::getBuffer(int i)

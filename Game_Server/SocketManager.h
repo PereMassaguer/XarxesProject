@@ -28,6 +28,8 @@ public:
 	void SocketReceive();
 	void SendMessage(std::string message);
 
+	void SendMessage(std::string message, int i);
+
 	char* getBuffer(int i);
 	void EraseBuffer(int i);
 

@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="GUIButton.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="Unit.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="GUIButton.h" />
     <ClInclude Include="ID.h" />
     <ClInclude Include="SocketManager.h" />
     <ClInclude Include="Unit.h" />

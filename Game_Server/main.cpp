@@ -5,7 +5,6 @@
 #include <cstring>
 #include <vector>
 
-#include "GraphicsManager.h"
 #include "SocketManager.h"
 
 #define MAX_MENSAJES 30
@@ -35,6 +34,8 @@ int main()
 
 	std::vector<std::pair<Player, bool>> players;//player_data-gotData?
 	std::pair<Player, bool> tempPl, tempPl2;
+	tempPl.first.name.setString("\0");
+	tempPl2.first.name.setString("\0");
 	players.push_back(tempPl);
 	players.push_back(tempPl2);
 
@@ -51,10 +52,10 @@ int main()
 			for (int i = 0; i < 2; i++) {
 				if (*(SM.getBuffer(i)) != '\0' && !players[i].second) {
 					std::string t = &(*(SM.getBuffer(i)));
-					//SM.EraseBuffer(i);
+					std::cout << "Received player: " << i << " "<< &*(SM.getBuffer(i)) << std::endl;
+					SM.EraseBuffer(i);
 					t = t.substr(t.find('_') + 1, t.size());
-					t = t.substr(t.find('_') + 1, t.size());
-					std::cout << t << std::endl;
+
 					players[i].first.name.setString(t.substr(0, t.find('_')));
 
 					players[i].second = true;
@@ -63,17 +64,30 @@ int main()
 
 			//Comprobamos si se ha recibido el nombre de todos los jugadores
 			gameState = GameState::GAME_LOOP;
-			for (auto it : players)  if (!it.second) gameState = GameState::NAME_INPUT;
-			if (gameState == GameState::GAME_LOOP) SM.SendMessage();
+			for (auto it : players) {
+				if (it.first.name.getString().toAnsiString() == "\0") {
+					gameState = GameState::NAME_INPUT;
+				}
+			}
+			
+			if (gameState == GameState::GAME_LOOP) {
+				SM.SendMessage(players[0].first.name.getString(), 1);
+				SM.SendMessage(players[1].first.name.getString(), 0);
+			}
 
 			break;
 		case GAME_LOOP:
-			std::cout << "gameloop" << std::endl;
+			//std::cout << "gameloop" << std::endl;
 			break;
 		default:
 			break;
 		}
-
+		
+		
+		if (*(SM.getBuffer(0)) != '\0') {
+			//std::cout << &*(SM.getBuffer(0)) << std::endl;
+			//SM.EraseBuffer();
+		}
 	}
 	getClientMessage.terminate();
 

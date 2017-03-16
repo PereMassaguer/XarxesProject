@@ -9,18 +9,19 @@
 #include "Unit.h"
 #include "WorldMap.h"
 
-#define MAX_MENSAJES 30
 
 
 int main()
 {
 	///////////////////////////////////////////////////Graphics
-	sf::Vector2i screenDimensions(900, 650);
+	sf::Vector2i screenDimensions(900, 675);
 
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Client");
 
 	WorldMap worldMap;
+	GUIButton _button(Coordinate(450, 600));
+
 
 	sf::Font font;
 	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
@@ -28,9 +29,6 @@ int main()
 
 	sf::String mensaje;
 	mensaje = "";
-	sf::Text chattingText(mensaje, font, 14);
-	chattingText.setFillColor(sf::Color(0, 160, 0));
-	chattingText.setStyle(sf::Text::Bold);
 
 
 	sf::Text text(mensaje, font, 14);
@@ -54,14 +52,14 @@ int main()
 	user.name.setPosition(30, 105);
 
 
-	sf::Text auxText("Random_Name", font, 14);
+	sf::Text auxText("Connecting...", font, 24);
 	auxText.setFillColor(sf::Color(255, 255, 255));
 	auxText.setStyle(sf::Text::Bold);
-	auxText.setPosition(window.getSize().x / 2 + 30, 105);
+	auxText.setPosition(window.getSize().x / 2 + 175, window.getSize().y - 55);
 	opponent.name = auxText;
 
-	auxText.setString("User_Name");
-	auxText.setPosition(30, 105);
+	auxText.setString("Write your name");
+	auxText.setPosition(25, window.getSize().y - 55);
 	user.name = auxText;
 
 	auxText.setString("0");
@@ -73,33 +71,23 @@ int main()
 	opponent.score = auxText;
 
 
-	sf::Text timeLeft("4321", font, 14);
-	timeLeft.setFillColor(sf::Color(255, 0, 0));
-	timeLeft.setStyle(sf::Text::Bold);
-	timeLeft.setPosition(window.getSize().x - 125, 30);
 
-
-
-
-
-	//texts.push_back(&targetWord);
-	texts.push_back(&timeLeft);
 	texts.push_back(&user.name);
-	texts.push_back(&user.score);
+	//texts.push_back(&user.score);
 	texts.push_back(&opponent.name);
-	texts.push_back(&opponent.score);
+	//texts.push_back(&opponent.score);
 	
 
-	/*std::string responseText = "Connected to: Client";
+	std::string responseText = "Connected to: Client";
 	SM.ClientInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
-	*/
+	
 
 
 	
-	GameState gameState = GameState::TROOP_DEPLOY;
+	GameState gameState = GameState::NAME_INPUT;
 
 	while (window.isOpen()) {
 		sf::Event evento;
@@ -109,6 +97,7 @@ int main()
 			{
 			case sf::Event::Closed:
 				window.close();
+
 				break;
 
 			case sf::Event::KeyPressed:
@@ -116,17 +105,41 @@ int main()
 					window.close();
 				else if (evento.key.code == sf::Keyboard::Return) {
 				}
+
 				break;
 
 			case sf::Event::TextEntered:
-				if (evento.text.unicode >= 32 && evento.text.unicode <= 126)
-					mensaje += (char)evento.text.unicode;
-				else if (evento.text.unicode == 8 && mensaje.getSize() > 2)
-					mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
+				if (gameState == GameState::NAME_INPUT) {
+					if (evento.text.unicode >= 32 && evento.text.unicode <= 126 && mensaje.getSize() < 10) {
+						if (evento.text.unicode == 32) evento.text.unicode = 95;
+						mensaje += (char)evento.text.unicode;
+					}
+					else if (evento.text.unicode == 8 && mensaje.getSize() > 0)
+						mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
+
+					_button.SetReady(mensaje.getSize() >= 2 ? true : false);
+					user.name.setString(mensaje.getSize() == 0 ? "Write your name" : mensaje);
+				}
 				break;
 
 			case sf::Event::MouseButtonPressed:
-				worldMap.ActivateCell(evento.mouseButton, gameState);
+				if (gameState == GameState::TROOP_DEPLOY) {
+					worldMap.ActivateCell(evento.mouseButton, gameState);
+					_button.SetReady(worldMap.GetPlayerUnits() == 3 ? true : false);
+				}
+
+				if (gameState == GameState::NAME_INPUT) {
+					if (_button.CheckActivated(evento.mouseButton)) {
+						_button.SetReady(false);
+						std::string t = "Start_";
+						t += user.name.getString();
+						SM.SendMessage(t);
+					}
+				}				
+				
+				if (gameState == GameState::GAME_LOOP) {
+					worldMap.ActivateCell(evento.mouseButton, gameState);
+				}
 
 				break;
 
@@ -137,25 +150,19 @@ int main()
 		}
 
 		if (*(SM.getBuffer()) != '\0') {
-
-			//SM.EraseBuffer();
+			if (gameState == GameState::NAME_INPUT) {
+				std::string t = &(*(SM.getBuffer()));
+				std::cout << t << std::endl;
+				SM.EraseBuffer();
+				t = t.substr(t.find('_') + 1, t.size());
+				opponent.name.setString(t);
+				gameState = GameState::TROOP_DEPLOY;
+			}
 		}
 
-		sf::RectangleShape t(sf::Vector2f(window.getSize()));
-		t.setFillColor(sf::Color(C_RED));
-		//window.draw(t);
 		worldMap.Draw(window);
-
-		/*for (size_t i = 0; i < User_messages.size(); i++) {
-			std::string chatting = User_messages[i];
-
-			chattingText.setPosition(sf::Vector2f(25, 175 + 20 * i));
-			chattingText.setString(chatting);
-			window.draw(chattingText);
-		}*/
-
-		//for (auto it : texts) window.draw(*it);
-
+		for (auto it : texts) window.draw(*it);
+		_button.Draw(window);
 
 
 		window.display();

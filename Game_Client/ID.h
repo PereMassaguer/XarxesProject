@@ -38,3 +38,9 @@ enum ColorID {
 #define C_GREEN 0, 255, 0, 255
 #define C_BLUE 0, 0, 255, 255
 #define C_BLACK 0, 0, 0, 255
+
+
+
+
+#define P_START Start_ //Send name
+#define P_SETUP Units_ //Send Nunits_, Xcoord_, Ycoord_(*Nunits) 

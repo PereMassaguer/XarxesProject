@@ -41,6 +41,7 @@ void SocketManager::SocketReceive() {
 void SocketManager::SendMessage(std::string message)
 {
 	size_t sentBytes;
+	std::cout << "Sent: " << message << std::endl;
 	socket.send(message.c_str(), message.length() + 1, sentBytes);
 }
 

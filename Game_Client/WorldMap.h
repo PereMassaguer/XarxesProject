@@ -2,8 +2,11 @@
 #include <math.h>
 #include <SFML\Graphics.hpp>
 
+
 #include "Cell.h"
+#include "GUIButton.h"
 #include "ID.h"
+#include "SocketManager.h"
 #include "Unit.h"
 
 class WorldMap
@@ -13,6 +16,7 @@ class WorldMap
 
 	std::vector<Unit> _playerUnits;
 	Unit *_selectedUnit;
+
 
 public:
 	WorldMap();
@@ -27,5 +31,6 @@ public:
 	void ColourateArea(Coordinate centerCoord, int range);
 	void EraseCellColours();
 
+	int GetPlayerUnits();
 	void Draw(sf::RenderWindow &window);
 };

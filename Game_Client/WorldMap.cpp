@@ -1,11 +1,11 @@
 #include "WorldMap.h"
-#include <iostream>
 
 WorldMap::WorldMap()
 {
 	for (int i = 0; i < MAP_ROWS; i++)
 		for (int j = 0; j < MAP_COLUMNS; j++) _cell[j][i] = Cell(std::make_pair(j, i));
 
+	
 
 	_selectedUnit = nullptr; 
 }
@@ -13,6 +13,11 @@ WorldMap::WorldMap()
 
 WorldMap::~WorldMap()
 {
+}
+
+int WorldMap::GetPlayerUnits()
+{
+	return _playerUnits.size();
 }
 
 void WorldMap::Draw(sf::RenderWindow & window)
@@ -30,8 +35,7 @@ void WorldMap::ColourateCell(Coordinate cellCoord, ColorID colour)
 {
 	_cell[cellCoord.first][cellCoord.second].Colourate(colour);
 
-	if (colour != ColorID::WHITE) 
-		_colouratedCells.push_back(cellCoord);
+	if (colour != ColorID::WHITE) _colouratedCells.push_back(cellCoord);
 }
 
 void WorldMap::ColourateArea(Coordinate centerCoord, int range)
@@ -51,9 +55,8 @@ void WorldMap::ColourateArea(Coordinate centerCoord, int range)
 		for (int j = clampedY.first; j <= clampedY.second; j++) {
 			Coordinate aux(abs(i - centerCoord.first), abs(j - centerCoord.second));
 			float dist = sqrt((float)aux.first * (float)aux.first + (float)aux.second * (float)aux.second);
-			if (dist <= range && dist > 0.2f) {
+			if (dist <= range && dist > 0.2f)
 				ColourateCell(Coordinate(i, j), ColorID::GREEN);
-			}
 		}
 	}
 }
@@ -66,6 +69,8 @@ Coordinate WorldMap::GetMousedCell(sf::Event::MouseButtonEvent & me)
 void WorldMap::ActivateCell(sf::Event::MouseButtonEvent mouse, GameState &gameState)
 {
 	Coordinate coord = GetMousedCell(mouse);
+	
+	if (coord.first < 0 || coord.first >= MAP_COLUMNS || coord.second < 0 || coord.second >= MAP_ROWS) return;
 	bool clear = true;
 	switch (gameState)
 	{
@@ -75,11 +80,7 @@ void WorldMap::ActivateCell(sf::Event::MouseButtonEvent mouse, GameState &gameSt
 		break;
 	case TROOP_DEPLOY:
 		if (mouse.button == sf::Mouse::Left) {
-			if (_playerUnits.size() < 3) {
-				_playerUnits.push_back(Unit(coord));
-			}
-			if (_playerUnits.size() == 3)
-				gameState = GameState::GAME_LOOP;
+			if (_playerUnits.size() < 3)  _playerUnits.push_back(Unit(coord));
 		}
 		break;
 	case GAME_LOOP:
