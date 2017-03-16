@@ -155,6 +155,7 @@
     <ClCompile Include="SocketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ID.h" />
     <ClInclude Include="SocketManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

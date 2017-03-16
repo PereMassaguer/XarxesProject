@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 
+#include "ID.h"
 #include "SocketManager.h"
 
 #define MAX_MENSAJES 30
@@ -14,11 +15,6 @@ int main()
 {
 	std::vector<std::string> aMensajes;
 
-	enum GameState {
-		USER_CONNECTION,
-		NAME_INPUT,
-		GAME_LOOP
-	};
 	GameState gameState = GameState::NAME_INPUT;
 
 
@@ -29,13 +25,14 @@ int main()
 
 	struct Player {
 		sf::Text name;
-		sf::Text score;
+		std::vector<Coordinate> units;
+		std::vector<Coordinate> base;
 	};
 
-	std::vector<std::pair<Player, bool>> players;//player_data-gotData?
-	std::pair<Player, bool> tempPl, tempPl2;
-	tempPl.first.name.setString("\0");
-	tempPl2.first.name.setString("\0");
+	std::vector<Player> players;
+	Player tempPl, tempPl2;
+	tempPl.name.setString("\0");
+	tempPl2.name.setString("\0");
 	players.push_back(tempPl);
 	players.push_back(tempPl2);
 
@@ -49,44 +46,58 @@ int main()
 
 		case NAME_INPUT:
 			//Set del nombre
-			for (int i = 0; i < 2; i++) {
-				if (*(SM.getBuffer(i)) != '\0' && !players[i].second) {
-					std::string t = &(*(SM.getBuffer(i)));
-					std::cout << "Received player: " << i << " "<< &*(SM.getBuffer(i)) << std::endl;
+			gameState = GameState::TROOP_DEPLOY;
+			for (int i = 0; i < players.size(); i++) {
+				std::string t = &(*(SM.getBuffer(i)));
+				if (t != "\0" && players[i].name.getString().toAnsiString() == "\0") {
+					std::cout << "Received player: " << i << " "<< t << std::endl;
 					SM.EraseBuffer(i);
-					t = t.substr(t.find('_') + 1, t.size());
-
-					players[i].first.name.setString(t.substr(0, t.find('_')));
-
-					players[i].second = true;
+					players[i].name.setString(t.substr(t.find('_') + 1, t.size()));
 				}
+
+				//Comprobamos si se ha recibido el nombre de todos los jugadores
+				if (players[i].name.getString().toAnsiString() == "\0") gameState = GameState::NAME_INPUT;
 			}
 
-			//Comprobamos si se ha recibido el nombre de todos los jugadores
-			gameState = GameState::GAME_LOOP;
-			for (auto it : players) {
-				if (it.first.name.getString().toAnsiString() == "\0") {
-					gameState = GameState::NAME_INPUT;
-				}
-			}
 			
-			if (gameState == GameState::GAME_LOOP) {
-				SM.SendMessage(players[0].first.name.getString(), 1);
-				SM.SendMessage(players[1].first.name.getString(), 0);
+			if (gameState == GameState::TROOP_DEPLOY) {
+				SM.SendMessage(players[0].name.getString(), 1);
+				SM.SendMessage(players[1].name.getString(), 0);
 			}
 
 			break;
+
+		case TROOP_DEPLOY:
+			gameState = GameState::GAME_LOOP;
+			for (int i = 0; i < players.size(); i++) {
+				std::string t = &(*(SM.getBuffer(i)));
+				if (t != "\0") {
+					SM.EraseBuffer(i);
+					t = t.substr(t.find('_') + 1, t.size());
+					int units = std::stoi(t.substr(0, t.find('_')));
+					std::cout << "Received " << units << " units from player: " << i << std::endl;
+					
+					for (int j = 0; j < units; j++) {
+						Coordinate tCoord;
+						t = t.substr(t.find('_') + 1, t.size());
+						tCoord.first = stoi(t.substr(0, t.find('_')));
+						t = t.substr(t.find('_') + 1, t.size());
+						tCoord.second = stoi(t.substr(0, t.find('_')));
+
+						std::cout << "Unit " << j << ": " << tCoord.first << ", " << tCoord.second << std::endl;
+						players[i].units.push_back(Coordinate());
+					}
+				}
+				//Comprobamos si se ha recibido las unidades de un jugador
+				if (players[i].units.size() == 0) gameState = GameState::TROOP_DEPLOY;
+			}
+			break;
+
 		case GAME_LOOP:
 			//std::cout << "gameloop" << std::endl;
 			break;
 		default:
 			break;
-		}
-		
-		
-		if (*(SM.getBuffer(0)) != '\0') {
-			//std::cout << &*(SM.getBuffer(0)) << std::endl;
-			//SM.EraseBuffer();
 		}
 	}
 	getClientMessage.terminate();

@@ -85,7 +85,7 @@ int main()
 	getClientMessage.launch();
 	
 
-
+	window.setPosition(sf::Vector2i(0, 200));
 	
 	GameState gameState = GameState::NAME_INPUT;
 
@@ -126,6 +126,16 @@ int main()
 				if (gameState == GameState::TROOP_DEPLOY) {
 					worldMap.ActivateCell(evento.mouseButton, gameState);
 					_button.SetReady(worldMap.GetPlayerUnits() == 3 ? true : false);
+					if (_button.CheckActivated(evento.mouseButton)) {
+						_button.SetReady(false);
+						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
+						std::string t = "Setup_" + std::to_string(tCoord.size());
+						for (auto it : tCoord) {
+							t += "_" + std::to_string(it.first);
+							t += "_" + std::to_string(it.second);
+						}
+						SM.SendMessage(t);
+					}
 				}
 
 				if (gameState == GameState::NAME_INPUT) {

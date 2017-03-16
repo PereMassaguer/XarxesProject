@@ -31,6 +31,9 @@ public:
 	void ColourateArea(Coordinate centerCoord, int range);
 	void EraseCellColours();
 
+	bool CellIsEmpty(Coordinate c);
+
 	int GetPlayerUnits();
+	std::vector<Coordinate> GetPlayerUnitsCoords();
 	void Draw(sf::RenderWindow &window);
 };

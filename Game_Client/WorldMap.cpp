@@ -20,6 +20,13 @@ int WorldMap::GetPlayerUnits()
 	return _playerUnits.size();
 }
 
+std::vector<Coordinate> WorldMap::GetPlayerUnitsCoords()
+{
+	std::vector<Coordinate> v;
+	for (auto it : _playerUnits) v.push_back(it._pos);
+	return v;
+}
+
 void WorldMap::Draw(sf::RenderWindow & window)
 {
 	for (auto it : _playerUnits) it.Draw(window);
@@ -80,6 +87,11 @@ void WorldMap::ActivateCell(sf::Event::MouseButtonEvent mouse, GameState &gameSt
 		break;
 	case TROOP_DEPLOY:
 		if (mouse.button == sf::Mouse::Left) {
+			bool cellIsFree = true;
+			for (auto it : _playerUnits) 
+				if (it._pos == coord) break;
+
+
 			if (_playerUnits.size() < 3)  _playerUnits.push_back(Unit(coord));
 		}
 		break;
@@ -120,4 +132,14 @@ void WorldMap::EraseCellColours()
 		 _cell[it.first][it.second].Colourate(ColorID::WHITE);
 	
 	_colouratedCells.clear();
+}
+
+
+bool WorldMap::CellIsEmpty(Coordinate c)
+{
+	for (auto it : _playerUnits)
+		if (it._pos == c) return false;
+
+	for (auto it : _playerUnits)
+		if (it._pos == c) return false;
 }
