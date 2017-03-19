@@ -15,9 +15,13 @@ class WorldMap
 	std::vector<Coordinate> _colouratedCells;
 
 	std::vector<Unit> _playerUnits;
+	std::vector<Unit> _playerBases;
 	Unit *_selectedUnit;
+	
+	std::vector<Unit> _enemyUnits;
+	std::vector<Unit> _enemyBases;
 
-
+	int movementsLeft;
 public:
 	WorldMap();
 	~WorldMap();
@@ -34,6 +38,15 @@ public:
 	bool CellIsEmpty(Coordinate c);
 
 	int GetPlayerUnits();
+	int GetPlayerBases();
+	void SetEnemyUnits(std::string t);
+	void SetEnemyBases(std::string t);
+	void SetEnemyData(std::string t);
 	std::vector<Coordinate> GetPlayerUnitsCoords();
+	std::vector<Coordinate> GetPlayerBasesCoords();
+
+	int GetMovementsLeft();
+	void SetMovementsLeft(int i);
+
 	void Draw(sf::RenderWindow &window);
 };

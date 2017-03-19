@@ -7,6 +7,10 @@
 #define CELL_SIZE_X 60
 #define CELL_SIZE_Y 60
 
+#define STARTING_UNITS 3
+#define STARTING_BASES 2
+#define STARTING_HP 3
+
 
 typedef std::pair<int, int> Coordinate;
 
@@ -23,6 +27,8 @@ enum GameState {
 	USER_CONNECTION,
 	NAME_INPUT,
 	TROOP_DEPLOY,
+	BASE_DEPLOY,
+	START_GAME,
 	GAME_LOOP
 };
 

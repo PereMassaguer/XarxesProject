@@ -18,6 +18,7 @@ int main()
 
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Client");
+	window.setPosition(sf::Vector2i(0, 200));
 
 	WorldMap worldMap;
 	GUIButton _button(Coordinate(450, 600));
@@ -73,25 +74,22 @@ int main()
 
 
 	texts.push_back(&user.name);
-	//texts.push_back(&user.score);
 	texts.push_back(&opponent.name);
-	//texts.push_back(&opponent.score);
 	
-
-	std::string responseText = "Connected to: Client";
 	SM.ClientInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 	
 
-	window.setPosition(sf::Vector2i(0, 200));
-	
-	GameState gameState = GameState::NAME_INPUT;
+	GameState gameState = GameState::USER_CONNECTION;
+	SM.SendMessage("Hello");
 
+
+	bool waiting = false;
 	while (window.isOpen()) {
 		sf::Event evento;
-		while (window.pollEvent(evento))
+		while (window.pollEvent(evento) && !waiting)
 		{
 			switch (evento.type)
 			{
@@ -123,20 +121,6 @@ int main()
 				break;
 
 			case sf::Event::MouseButtonPressed:
-				if (gameState == GameState::TROOP_DEPLOY) {
-					worldMap.ActivateCell(evento.mouseButton, gameState);
-					_button.SetReady(worldMap.GetPlayerUnits() == 3 ? true : false);
-					if (_button.CheckActivated(evento.mouseButton)) {
-						_button.SetReady(false);
-						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
-						std::string t = "Setup_" + std::to_string(tCoord.size());
-						for (auto it : tCoord) {
-							t += "_" + std::to_string(it.first);
-							t += "_" + std::to_string(it.second);
-						}
-						SM.SendMessage(t);
-					}
-				}
 
 				if (gameState == GameState::NAME_INPUT) {
 					if (_button.CheckActivated(evento.mouseButton)) {
@@ -144,11 +128,63 @@ int main()
 						std::string t = "Start_";
 						t += user.name.getString();
 						SM.SendMessage(t);
+						waiting = true;
+					}
+				}
+
+				if (gameState == GameState::TROOP_DEPLOY) {
+					worldMap.ActivateCell(evento.mouseButton, gameState);
+					_button.SetReady(worldMap.GetPlayerUnits() == 3 ? true : false);
+					if (_button.CheckActivated(evento.mouseButton)) {
+						_button.SetReady(false);
+						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
+						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
+						for (auto it : tCoord) {
+							t += "_" + std::to_string(it.first);
+							t += "_" + std::to_string(it.second);
+						}
+						SM.SendMessage(t);
+						waiting = true;
 					}
 				}				
-				
-				if (gameState == GameState::GAME_LOOP) {
+
+				if (gameState == GameState::BASE_DEPLOY) {
 					worldMap.ActivateCell(evento.mouseButton, gameState);
+					_button.SetReady(worldMap.GetPlayerBases() == 2 ? true : false);
+					if (_button.CheckActivated(evento.mouseButton)) {
+						_button.SetReady(false);
+						std::vector<Coordinate> tCoord = worldMap.GetPlayerBasesCoords();
+						std::string t = "BaseSetup_" + std::to_string(tCoord.size());
+						for (auto it : tCoord) {
+							t += "_" + std::to_string(it.first);
+							t += "_" + std::to_string(it.second);
+						}
+						SM.SendMessage(t);
+						waiting = true;
+					}
+				}
+
+				if (gameState == GameState::GAME_LOOP && !waiting) {
+					worldMap.ActivateCell(evento.mouseButton, gameState);
+					_button.SetReady(true);
+					if (_button.CheckActivated(evento.mouseButton)) {
+						_button.SetReady(false);
+						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
+						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
+						for (auto it : tCoord) {
+							t += "_" + std::to_string(it.first);
+							t += "_" + std::to_string(it.second);
+						}
+						tCoord = worldMap.GetPlayerBasesCoords();
+						t += "BaseSetup_" + std::to_string(tCoord.size());
+						for (auto it : tCoord) {
+							t += "_" + std::to_string(it.first);
+							t += "_" + std::to_string(it.second);
+						}
+						SM.SendMessage(t);
+						waiting = true;
+						worldMap.SetMovementsLeft(PLAYER_UNIT);
+					}
 				}
 
 				break;
@@ -159,15 +195,38 @@ int main()
 			}	
 		}
 
+
+		std::string t = &(*(SM.getBuffer()));
 		if (*(SM.getBuffer()) != '\0') {
-			if (gameState == GameState::NAME_INPUT) {
-				std::string t = &(*(SM.getBuffer()));
-				std::cout << t << std::endl;
-				SM.EraseBuffer();
+			std::cout << t << std::endl;
+			switch (gameState)
+			{
+			case USER_CONNECTION:
+				gameState = GameState::NAME_INPUT;
+				break;
+			case NAME_INPUT:
 				t = t.substr(t.find('_') + 1, t.size());
 				opponent.name.setString(t);
 				gameState = GameState::TROOP_DEPLOY;
+				waiting = false;
+				break;
+			case TROOP_DEPLOY:
+				worldMap.SetEnemyUnits(t);
+				gameState = GameState::BASE_DEPLOY;
+				waiting = false;
+				break;
+			case BASE_DEPLOY:
+				worldMap.SetEnemyBases(t);
+				gameState = GameState::GAME_LOOP;
+				break;
+			case GAME_LOOP:
+				worldMap.SetEnemyData(t);
+				waiting = false;
+				break;
+			default:
+				break;
 			}
+			SM.EraseBuffer();
 		}
 
 		worldMap.Draw(window);
@@ -190,6 +249,5 @@ int main()
 
 	std::cout << "Connection stopped" << std::endl;
 	//system("pause");
-	return 0;
-	
+	return 0;	
 }
