@@ -162,7 +162,6 @@
   <ItemGroup>
     <ClInclude Include="Cell.h" />
     <ClInclude Include="GUIButton.h" />
-    <ClInclude Include="ID.h" />
     <ClInclude Include="WorldMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

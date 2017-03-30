@@ -43,7 +43,7 @@ int main()
 				if (event.key.code == sf::Keyboard::Escape) window.close();
 				
 				if (event.key.code == sf::Keyboard::Return) {
-					if (gameState == GameState::NAME_INPUT) {
+					if (gameState == GameState::NAME_INPUT && msg.getSize() >= 2 && !waiting) {
 						CM.Send("HELLO_" + name);
 						instructions.setString("Waiting for connection confirmation");
 						waiting = true;
@@ -59,7 +59,6 @@ int main()
 					}
 					else if (event.text.unicode == 8 && msg.getSize() > 0)
 						msg.erase(msg.getSize() - 1, msg.getSize());
-
 					name = msg;
 				}
 				break;
@@ -75,9 +74,8 @@ int main()
 		case NAME_INPUT:
 			if(!waiting) instructions.setString("Enter your name: " + name);
 			else {
-				if (CM.GetBuffer() != "") {
+				if (CM.GetBuffer() != "") 
 					Debug(CM.GetBuffer());
-				}
 			}
 			break;
 		case TROOP_DEPLOY:

@@ -19,6 +19,8 @@
 #define STARTING_HP 3
 
 
+#define STATUS_TIME 1000
+
 typedef std::pair<int, int> Coordinate;
 
 enum ElementID {

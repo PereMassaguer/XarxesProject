@@ -3,13 +3,14 @@
 
 #include "SFML\Network\UdpSocket.hpp"
 #include "ID.h"
+#include <map>
 
 #define CM ConnectionManager::Instance()
 class ConnectionManager
 {
 	char _buffer[BUFFER_SIZE];
 	sf::UdpSocket _socket;
-	std::pair<sf::IpAddress, unsigned short> _server;
+	std::pair<sf::IpAddress, unsigned short> _server, _sockSend;
 	char _connectionType;
 public:
 	ConnectionManager();
