@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML\Graphics.hpp>
 #include <SFML\Network.hpp>
+#include <SFML\Audio.hpp>
 #include <string>
 #include <cstring>
 #include <vector>
@@ -13,202 +14,81 @@
 
 int main()
 {
-	///////////////////////////////////////////////////Graphics
-	std::vector<std::string> User_messages;
-	std::vector<std::string> Opponent_messages;
-
-
 	sf::Vector2i screenDimensions(800, 600);
 
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Client");
 
-	sf::Font font;
-	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
-
-
-	sf::String mensaje;
-	mensaje = "";
-	sf::Text chattingText(mensaje, font, 14);
-	chattingText.setFillColor(sf::Color(0, 160, 0));
-	chattingText.setStyle(sf::Text::Bold);
-
-
-	sf::Text text(mensaje, font, 14);
-	text.setFillColor(sf::Color(0, 160, 0));
-	text.setStyle(sf::Text::Bold);
-	text.setPosition(0, 560);
-
-	std::vector<sf::RectangleShape> separator;
-	std::vector<sf::Text*> texts;
-
-	sf::RectangleShape t(sf::Vector2f(800, 5));
-	t.setFillColor(sf::Color(200, 200, 200, 255));
-	t.setPosition(0, 550);
-	separator.push_back(t);
-
-	t.setSize(sf::Vector2f(5, 525));
-	t.setPosition(window.getSize().x / 2, 75);
-	separator.push_back(t);
-
-	t.setSize(sf::Vector2f(800, 5));
-	t.setPosition(0, 75);
-	separator.push_back(t);
-
-	t.setSize(sf::Vector2f(800, 5));
-	t.setPosition(0, 150);
-	separator.push_back(t);
-
-	t.setSize(sf::Vector2f(5, 75));
-	t.setPosition(650, 0);
-	separator.push_back(t);
-
-	
-	///////////////////////////////////////////////////Graphics\
-
-	std::string targetWords[5] { "Word_1", "Word_2", "Word_3", "Word_4", "Word_5"};
-	sf::Text targetWord(targetWords[0], font, 14);
-	targetWord.setFillColor(sf::Color(255, 255, 0));
-	targetWord.setStyle(sf::Text::Bold);
-	targetWord.setPosition(30, 30);
-
-
-	struct player {
-		sf::Text name;
-		sf::Text score;
-	};
-	player user;
-	player opponent;
-
-	user.name.setFillColor(sf::Color(255, 255, 255));
-	user.name.setStyle(sf::Text::Bold);
-	user.name.setPosition(30, 105);
-
-
-	sf::Text auxText("Random_Name", font, 14);
-	auxText.setFillColor(sf::Color(255, 255, 255));
-	auxText.setStyle(sf::Text::Bold);
-	auxText.setPosition(window.getSize().x / 2 + 30, 105);
-	opponent.name = auxText;
-
-	auxText.setString("User_Name");
-	auxText.setPosition(30, 105);
-	user.name = auxText;
-
-	auxText.setString("0");
-	auxText.setPosition(window.getSize().x / 2 - 50, 105);
-	auxText.setFillColor(sf::Color(0, 255, 255));
-	user.score = auxText;
-
-	auxText.setPosition(window.getSize().x - 50, 105);
-	opponent.score = auxText;
-
-
-	sf::Text timeLeft("4321", font, 14);
-	timeLeft.setFillColor(sf::Color(255, 0, 0));
-	timeLeft.setStyle(sf::Text::Bold);
-	timeLeft.setPosition(window.getSize().x - 125, 30);
-
-	
-
-
-
-	texts.push_back(&targetWord);
-	texts.push_back(&timeLeft);
-	texts.push_back(&user.name);
-	texts.push_back(&user.score);
-	texts.push_back(&opponent.name);
-	texts.push_back(&opponent.score);
-
-
-	std::string responseText = "Connected to: Client";
 	SM.ClientInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 
+	//Sound
+	sf::SoundBuffer soundbuffer;
+	if (!soundbuffer.loadFromFile("terror.wav")) {
+		std::cout << "error music" << std::endl;
+	}
+	sf::Sound sound;
+	sound.setBuffer(soundbuffer);
+	sound.setLoop(true);
 
+	//Image
+	sf::Texture texture;
+	texture.loadFromFile("monster.png");
 
-	enum GameState {
-		USER_CONNECTION,
-		NAME_INPUT,
-		GAME_LOOP
-	};
-	GameState gameState = GameState::USER_CONNECTION;
+	std::vector<sf::Sprite> monsters;
+
 
 	while (window.isOpen()) {
 
-		switch (gameState)
-		{
-		case USER_CONNECTION:
-			if (mensaje.getSize() > 2 && mensaje.getSize() < 16)
-				//SM.SendMessage("PLAYERINFO_" + mensaje + "_" + opponent.score.getString());
-			break;
+		if (*(SM.getBuffer()) != '\0') {
+			std::string t = SM.getBuffer();
+			std::cout << t << std::endl;
 
-		case NAME_INPUT:
+			int i = stoi(t);
 
-			break;
-		case GAME_LOOP:
-			break;
-		default:
-			break;
-		}
-
-
-
-
-		sf::Event evento;
-		while (window.pollEvent(evento))
-		{
-			switch (evento.type)
+			switch (i)
 			{
-			case sf::Event::Closed:
-				window.close();
+			case 1:
+				sound.play();
 				break;
-			case sf::Event::KeyPressed:
-				if (evento.key.code == sf::Keyboard::Escape)
-					window.close();
-				else if (evento.key.code == sf::Keyboard::Return) {
-					SM.SendMessage(mensaje);
-					if (User_messages.size() > 25) User_messages.erase(User_messages.begin(), User_messages.begin() + 1);
+			case 2:
+				sound.stop();
+				break;
+			case 4:
+				monsters.clear();
+				break;
+			default:
+				std::string temp = t.substr(0, 1);
+				if (stoi(temp) == 3) {
+					monsters.clear();
+
+					int nMonsters = stoi(t.substr(1, t.size()));
+					sf::Sprite sprite;
+					sprite.setTexture(texture, true);
+					for (int i = 0; i < nMonsters; i++) {
+						float x = ((double)rand() / (RAND_MAX + 1)) * 800;
+						float y = ((double)rand() / (RAND_MAX + 1)) * 600;
+						sprite.setPosition(x, y);
+						monsters.push_back(sprite);
+					}
 				}
-				break;
-			case sf::Event::TextEntered:
-				if (evento.text.unicode >= 32 && evento.text.unicode <= 126)
-					mensaje += (char)evento.text.unicode;
-				else if (evento.text.unicode == 8 && mensaje.getSize() > 2)
-					mensaje.erase(mensaje.getSize() - 1, mensaje.getSize());
+
 				break;
 			}
-		}
-		if (*(SM.getBuffer()) != '\0') {
-			//std::cout << *(SM.getBuffer()) << std::endl;
-			User_messages.push_back(SM.getBuffer());
 			SM.EraseBuffer();
 		}
-
-		for(auto it : separator) window.draw(it);
-
-		for (size_t i = 0; i < User_messages.size(); i++) {
-			std::string chatting = User_messages[i];
-
-			chattingText.setPosition(sf::Vector2f(25, 175 + 20 * i));
-			chattingText.setString(chatting);
-			window.draw(chattingText);
-		}
-		std::string mensaje_ = mensaje + "_";
-		text.setString(mensaje_);
-		window.draw(text);
-		for (auto it : texts) window.draw(*it);
-		
+		for (auto &it : monsters) window.draw(it);
 
 
 		window.display();
 		window.clear();
 
 		if (SM.GetConnectionStatus() == sf::TcpSocket::Disconnected) {
-			std::cout << "Server down" << std::endl;
-			window.close();
+			std::cout << "Disconnected" << std::endl;
+			SM.Disconnect();
+			//window.close();
 		}
 	}
 	SM.Disconnect();

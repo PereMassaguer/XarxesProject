@@ -10,7 +10,8 @@ class ConnectionManager
 {
 	char _buffer[BUFFER_SIZE];
 	sf::UdpSocket _socket;
-	std::pair<sf::IpAddress, unsigned short> _server, _sockSend;
+	std::pair<sf::IpAddress, unsigned short> _server;
+	std::pair<sf::IpAddress, unsigned short> _clients;
 	char _connectionType;
 public:
 	ConnectionManager();

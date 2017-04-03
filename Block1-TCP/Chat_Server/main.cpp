@@ -8,72 +8,23 @@
 #include "GraphicsManager.h"
 #include "SocketManager.h"
 
-#define MAX_MENSAJES 30
-
-
 int main()
 {
-	std::vector<std::string> aMensajes;
-
-	enum GameState {
-		USER_CONNECTION,
-		NAME_INPUT,
-		GAME_LOOP
-	};
-	GameState gameState = GameState::NAME_INPUT;
-
-
 	SM.ServerInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 
-	struct Player {
-		sf::Text name;
-		sf::Text score;
-	};
-
-	std::vector<std::pair<Player, bool>> players;//player_data-gotData?
-	std::pair<Player, bool> tempPl, tempPl2;
-	players.push_back(tempPl);
-	players.push_back(tempPl2);
-
-	bool done = false;
-	while (!done) {
-		switch (gameState)
-		{
-		case USER_CONNECTION:
-
-			break;
-			
-		case NAME_INPUT:
-			//Set del nombre
-			for (int i = 0; i < 2; i++) {
-				if (*(SM.getBuffer(i)) != '\0' && !players[i].second) {
-					std::string t = &(*(SM.getBuffer(i)));
-					//SM.EraseBuffer(i);
-					t = t.substr(t.find('_') + 1, t.size());
-					t = t.substr(t.find('_') + 1, t.size());
-					std::cout << t << std::endl;
-					players[i].first.name.setString(t.substr(0, t.find('_')));
-
-					players[i].second = true;
-				}
-			}
-
-			//Comprobamos si se ha recibido el nombre de todos los jugadores
-			gameState = GameState::GAME_LOOP;
-			for (auto it : players)  if (!it.second) gameState = GameState::NAME_INPUT;
-			if (gameState == GameState::GAME_LOOP) SM.SendMessage();
-
-			break;
-		case GAME_LOOP:
-			std::cout << "gameloop" << std::endl;
-			break;
-		default:
-			break;
-		}
-
+	std::cout << "1 - Play music" << std::endl;
+	std::cout << "2 - Stop music" << std::endl;
+	std::cout << "3+N - Spawn N monsters" << std::endl;
+	std::cout << "4 - Erase monsters" << std::endl;
+	while (true) {
+		sf::Event evento;
+		std::string t;
+		std::cin >> t;
+		if(t == "1" || t == "2" || t[0] == '3' || t == "4")
+			SM.SendMessage(t);
 	}
 	getClientMessage.terminate();
 

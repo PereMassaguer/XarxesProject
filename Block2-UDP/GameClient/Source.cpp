@@ -62,6 +62,7 @@ int main()
 					name = msg;
 				}
 				break;
+
 			default:
 				break;
 			}
@@ -74,8 +75,9 @@ int main()
 		case NAME_INPUT:
 			if(!waiting) instructions.setString("Enter your name: " + name);
 			else {
-				if (CM.GetBuffer() != "") 
-					Debug(CM.GetBuffer());
+				if (CM.GetBuffer() != "") {
+					//Debug(CM.GetBuffer());
+				}
 			}
 			break;
 		case TROOP_DEPLOY:

@@ -1,4 +1,1 @@
-﻿  Source.cpp
-c:\users\pmassaguer\documents\github\xarxesproject\block2-udp\gameserver\source.cpp(39): warning C4018: '<': signed/unsigned mismatch
-  GameServer.vcxproj -> C:\Users\pmassaguer\Documents\GitHub\XarxesProject\Block2-UDP\x64\Debug\GameServer.exe
-  GameServer.vcxproj -> C:\Users\pmassaguer\Documents\GitHub\XarxesProject\Block2-UDP\x64\Debug\GameServer.pdb (Full PDB)
+﻿
