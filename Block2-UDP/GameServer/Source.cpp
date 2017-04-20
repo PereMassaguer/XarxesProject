@@ -28,17 +28,9 @@ int main()
 	lastConCheck = GetTickCount();
 
 	while (true) {
-		std::string message = CM.GetBuffer();
-		if (message != "") {
-			if (message.substr(0, message.find("_")) == "HELLO") {
-				CM.EraseBuffer();
-				CM.Send("WELCOME_0");
-			}
-		}
-
-		else if (lastConCheck < GetTickCount() - STATUS_TIME) {
+		if (lastConCheck < GetTickCount() - PING) {
 			lastConCheck = GetTickCount();
-			CM.Send("CHECK");
+			CM.Send("ACK");
 		}
 	}
 

@@ -25,20 +25,37 @@ void ConnectionManager::Init(char connectionType) {
 		sf::Socket::Status st = _socket.bind(_server.second);
 		if (st != sf::Socket::Done)
 			Debug("Failed socket binding");
+		_playerId = 0;
 	}
 
 }
 
 void ConnectionManager::Send(std::string str) {
 	if (_connectionType == 's') {
-		if (_socket.send(str.c_str(), str.size(), _clients.first, _clients.second) != sf::Socket::Done)
-			Debug("Failure sending: " + str);
-		else { Debug("Sent: " + str); }
+		for (auto it : _clients) {
+			ConnectionData auxConnection = it.connectionData;
+			if (_socket.send(str.c_str(), str.size(), auxConnection.first, auxConnection.second) != sf::Socket::Done)
+				Debug("Failure sending: " + str);
+			else { Debug("Sent: " + str); }
+		}
 	}
 	else if (_connectionType == 'c') {
 		if (_socket.send(str.c_str(), str.size(), _server.first, _server.second) != sf::Socket::Done)
 			Debug("Failure sending: " + str);
 		else { Debug("Sent: " + str); }
+	}
+}
+
+
+void ConnectionManager::Send(std::string str, int playerID) {
+	for (auto it : _clients) {
+		if (it.id == playerID) {
+			ConnectionData auxConnection = it.connectionData;
+			if (_socket.send(str.c_str(), str.size(), auxConnection.first, auxConnection.second) != sf::Socket::Done)
+				Debug("Failure sending: " + str);
+			else { Debug("Sent: " + str); }
+			break;
+		}
 	}
 }
 
@@ -53,16 +70,27 @@ void ConnectionManager::Recv() {
 			Debug("Failure receiving");
 		}
 		else {
-			std::string t = _buffer;
-			t.c_str();
-			Debug("Received: " + t);
+			std::string message = _buffer;
+			message.c_str();
+			Debug("Received: " + message);
 			
-			if (t == "HELLO") {
-				_clients = _aux;
-				Debug("New client added");
+			if (message != "") {
+				if (message == "HELLO") {
+					Player tempPlayer;
+					tempPlayer.connectionData = _aux;
+					tempPlayer.id = _playerId;
+					_playerId++;
+					_clients.push_back(tempPlayer);
+					Debug("New client added; Ip: " + _aux.first.toString() + " Port: " + std::to_string(_aux.second));
+					CM.Send("WELCOME_" + std::to_string(tempPlayer.id), tempPlayer.id);
+				}
+				else if (message.substr(0, message.find("_")) == "HELLO") {
+					
+					CM.Send("WELCOME_0");
+				}
 			}
+			CM.EraseBuffer();
 		}
-
 	}
 }
 
@@ -73,6 +101,6 @@ std::string ConnectionManager::GetBuffer()
 
 
 void ConnectionManager::EraseBuffer() {
-	char t[2] = "";
-	strcpy_s(_buffer, t);
+	for (int i = 0; i < sizeof(_buffer); i++)
+		_buffer[i] = '\0';
 }

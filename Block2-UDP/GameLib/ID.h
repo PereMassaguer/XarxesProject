@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <SFML\Network.hpp>
 
 
 #define MAP_COLUMNS 10
@@ -19,9 +20,10 @@
 #define STARTING_HP 3
 
 
-#define STATUS_TIME 1000
+#define PING 1000
 
 typedef std::pair<int, int> Coordinate;
+typedef std::pair<sf::IpAddress, unsigned short> ConnectionData;
 
 enum ElementID {
 	CLEAN,

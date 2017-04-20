@@ -8,11 +8,21 @@
 #define CM ConnectionManager::Instance()
 class ConnectionManager
 {
+	struct Player {
+		int id;
+		std::string name;
+		Coordinate coord; 
+		ConnectionData connectionData;
+	};
+
 	char _buffer[BUFFER_SIZE];
 	sf::UdpSocket _socket;
-	std::pair<sf::IpAddress, unsigned short> _server;
-	std::pair<sf::IpAddress, unsigned short> _clients;
+	ConnectionData _server;
+	std::vector<Player> _clients;
 	char _connectionType;
+
+
+	int _playerId;
 public:
 	ConnectionManager();
 	inline static ConnectionManager &Instance() {
@@ -22,6 +32,7 @@ public:
 	~ConnectionManager();
 	void Init(char connectionType);
 	void Send(std::string str);
+	void Send(std::string str, int playerID);
 	void Recv();
 
 	std::string GetBuffer();

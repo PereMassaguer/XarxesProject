@@ -11,7 +11,6 @@ int main()
 	WorldMap worldMap;
 	PlayerInfo playerInfo;
 
-
 	sf::Vector2i screenDimensions(WINDOW_X, WINDOW_Y);
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Client");
