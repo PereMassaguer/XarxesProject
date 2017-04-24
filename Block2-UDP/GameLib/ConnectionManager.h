@@ -5,6 +5,11 @@
 #include "ID.h"
 #include <map>
 
+
+#include <time.h>
+
+#include <Windows.h>
+
 #define CM ConnectionManager::Instance()
 class ConnectionManager
 {
@@ -13,6 +18,7 @@ class ConnectionManager
 		std::string name;
 		Coordinate coord; 
 		ConnectionData connectionData;
+		int lastConCheck;
 	};
 
 	char _buffer[BUFFER_SIZE];

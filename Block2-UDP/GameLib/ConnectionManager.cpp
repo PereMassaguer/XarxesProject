@@ -1,7 +1,14 @@
 #include "ConnectionManager.h"
 
 
-
+/*funcs:
+	tryPing
+	addplayer
+	checkConn
+	DisconnectClient
+	DisconnectAll
+	
+*/
 ConnectionManager::ConnectionManager()
 {
 }
@@ -63,10 +70,10 @@ void ConnectionManager::Send(std::string str, int playerID) {
 void ConnectionManager::Recv() {
 	std::size_t received;
 	_socket.setBlocking(true);
-	std::pair<sf::IpAddress, unsigned short> _aux;
+	ConnectionData recvData;
 
 	while (true) {
-		if (_socket.receive(_buffer, BUFFER_SIZE, received, _aux.first, _aux.second) != sf::Socket::Done) {
+		if (_socket.receive(_buffer, BUFFER_SIZE, received, recvData.first, recvData.second) != sf::Socket::Done) {
 			Debug("Failure receiving");
 		}
 		else {
@@ -76,17 +83,28 @@ void ConnectionManager::Recv() {
 			
 			if (message != "") {
 				if (message == "HELLO") {
+					//void AddPlayer();
 					Player tempPlayer;
-					tempPlayer.connectionData = _aux;
+					tempPlayer.connectionData = recvData;
 					tempPlayer.id = _playerId;
+					tempPlayer.lastConCheck = GetTickCount();
 					_playerId++;
+					//-----
 					_clients.push_back(tempPlayer);
-					Debug("New client added; Ip: " + _aux.first.toString() + " Port: " + std::to_string(_aux.second));
+					Debug("New client added; Ip: " + recvData.first.toString() + " Port: " + std::to_string(recvData.second));
 					CM.Send("WELCOME_" + std::to_string(tempPlayer.id), tempPlayer.id);
 				}
+				else if (message == "ACK") {
+					for (auto it : _clients) {
+						if (it.connectionData == recvData) {
+							it.lastConCheck = GetTickCount();
+							break;
+						}
+					}
+				}
 				else if (message.substr(0, message.find("_")) == "HELLO") {
-					
-					CM.Send("WELCOME_0");
+					std::string name = message.substr(message.find("_") + 1, message.size()); 
+					CM.Send("WELCOME_" + name);
 				}
 			}
 			CM.EraseBuffer();
