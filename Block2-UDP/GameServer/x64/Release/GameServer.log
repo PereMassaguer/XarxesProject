@@ -1,6 +1,8 @@
 ﻿  Source.cpp
   Generating code
-  All 35 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  35 of 35 functions (100.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  GameServer.vcxproj -> c:\users\casoc\documents\visual studio 2015\Projects\GameClient\x64\Release\GameServer.exe
-  GameServer.vcxproj -> c:\users\casoc\documents\visual studio 2015\Projects\GameClient\x64\Release\GameServer.pdb (Full PDB)
+  GameServer.vcxproj -> C:\Users\pmassaguer\Desktop\Platilla_3Projects (1)\x64\Release\GameServer.exe
+  GameServer.vcxproj -> C:\Users\pmassaguer\Desktop\Platilla_3Projects (1)\x64\Release\GameServer.pdb (Full PDB)
