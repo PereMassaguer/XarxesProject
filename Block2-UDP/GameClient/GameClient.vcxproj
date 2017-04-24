@@ -155,7 +155,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
-    <ClInclude Include="Client.h" />
     <ClInclude Include="GUIButton.h" />
     <ClInclude Include="WorldMap.h" />
   </ItemGroup>

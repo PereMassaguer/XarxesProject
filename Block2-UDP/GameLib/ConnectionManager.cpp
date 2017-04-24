@@ -22,13 +22,13 @@ ConnectionManager::~ConnectionManager()
 void ConnectionManager::Init(char connectionType) {
 	_connectionType = connectionType;	
 
+	_server.first = sf::IpAddress::getLocalAddress();
+	_server.second = PORT;
 	if (_connectionType == 'c') {
 		std::string t = "HELLO";
 		_socket.send(t.c_str(), t.size(), sf::IpAddress::getLocalAddress(), PORT);
 	}
 	else if (_connectionType == 's') {
-		_server.first = sf::IpAddress::getLocalAddress();
-		_server.second = PORT;
 		sf::Socket::Status st = _socket.bind(_server.second);
 		if (st != sf::Socket::Done)
 			Debug("Failed socket binding");
@@ -54,16 +54,11 @@ void ConnectionManager::Send(std::string str) {
 }
 
 
-void ConnectionManager::Send(std::string str, int playerID) {
-	for (auto it : _clients) {
-		if (it.id == playerID) {
-			ConnectionData auxConnection = it.connectionData;
-			if (_socket.send(str.c_str(), str.size(), auxConnection.first, auxConnection.second) != sf::Socket::Done)
+void ConnectionManager::Send(std::string str, ConnectionData recvData) {
+
+		if (_socket.send(str.c_str(), str.size(), recvData.first, recvData.second) != sf::Socket::Done)
 				Debug("Failure sending: " + str);
-			else { Debug("Sent: " + str); }
-			break;
-		}
-	}
+		else { Debug("Sent: " + str); }
 }
 
 
@@ -92,7 +87,7 @@ void ConnectionManager::Recv() {
 					//-----
 					_clients.push_back(tempPlayer);
 					Debug("New client added; Ip: " + recvData.first.toString() + " Port: " + std::to_string(recvData.second));
-					CM.Send("WELCOME_" + std::to_string(tempPlayer.id), tempPlayer.id);
+					CM.Send("WELCOME_" + std::to_string(tempPlayer.id), recvData);
 				}
 				else if (message == "ACK") {
 					for (auto it : _clients) {
@@ -104,7 +99,7 @@ void ConnectionManager::Recv() {
 				}
 				else if (message.substr(0, message.find("_")) == "HELLO") {
 					std::string name = message.substr(message.find("_") + 1, message.size()); 
-					CM.Send("WELCOME_" + name);
+					CM.Send("WELCOME_" + name, recvData);
 				}
 			}
 			CM.EraseBuffer();

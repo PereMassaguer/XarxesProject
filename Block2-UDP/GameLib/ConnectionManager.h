@@ -38,7 +38,7 @@ public:
 	~ConnectionManager();
 	void Init(char connectionType);
 	void Send(std::string str);
-	void Send(std::string str, int playerID);
+	void Send(std::string str, ConnectionData recvData);
 	void Recv();
 
 	std::string GetBuffer();
