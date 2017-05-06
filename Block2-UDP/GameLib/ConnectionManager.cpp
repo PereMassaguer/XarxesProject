@@ -40,7 +40,7 @@ void ConnectionManager::Init(char connectionType) {
 void ConnectionManager::Send(std::string str) {
 	if (_connectionType == 's') {
 		for (auto it : _clients) {
-			ConnectionData auxConnection = it.connectionData;
+			ConnectionData auxConnection = it.first;
 			if (_socket.send(str.c_str(), str.size(), auxConnection.first, auxConnection.second) != sf::Socket::Done)
 				Debug("Failure sending: " + str);
 			else { Debug("Sent: " + str); }
@@ -80,19 +80,18 @@ void ConnectionManager::Recv() {
 				if (message == "HELLO") {
 					//void AddPlayer();
 					Player tempPlayer;
-					tempPlayer.connectionData = recvData;
 					tempPlayer.id = _playerId;
 					tempPlayer.lastConCheck = GetTickCount();
 					_playerId++;
 					//-----
-					_clients.push_back(tempPlayer);
+					_clients.insert(std::pair<ConnectionData, Player>(recvData, tempPlayer));
 					Debug("New client added; Ip: " + recvData.first.toString() + " Port: " + std::to_string(recvData.second));
 					CM.Send("WELCOME_" + std::to_string(tempPlayer.id), recvData);
 				}
 				else if (message == "ACK") {
 					for (auto it : _clients) {
-						if (it.connectionData == recvData) {
-							it.lastConCheck = GetTickCount();
+						if (it.first == recvData) {
+							it.second.lastConCheck = GetTickCount();
 							break;
 						}
 					}

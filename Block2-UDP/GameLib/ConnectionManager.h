@@ -16,15 +16,15 @@ class ConnectionManager
 	struct Player {
 		int id;
 		std::string name;
-		Coordinate coord; 
-		ConnectionData connectionData;
+		Coordinate coord;
 		int lastConCheck;
 	};
 
 	char _buffer[BUFFER_SIZE];
 	sf::UdpSocket _socket;
 	ConnectionData _server;
-	std::vector<Player> _clients;
+	std::map<ConnectionData, Player> _clients;
+	//std::vector<Player> _clients;
 	char _connectionType;
 
 
