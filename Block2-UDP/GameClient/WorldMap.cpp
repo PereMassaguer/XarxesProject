@@ -3,7 +3,7 @@
 WorldMap::WorldMap()
 {
 	//centers grid to X axis
-	_gridDisplacement = Coordinate((WINDOW_X - CELL_SIZE_X * MAP_COLUMNS) / 2, 0);
+	_gridDisplacement = Coordinate((WINDOW_X - CELL_SIZE_X * MAP_COLUMNS) / 2, -1);
 	
 	_cell = new Cell*[MAP_COLUMNS];
 	for (int i = 0; i < MAP_COLUMNS; i++) {
@@ -88,4 +88,9 @@ void WorldMap::Draw(sf::RenderWindow & window)
 		for (int j = 0; j < MAP_ROWS; j++)
 			_cell[i][j].Draw(window);
 	}
+}
+
+
+Coordinate WorldMap::GetGridDisplacement() {
+	return _gridDisplacement;
 }

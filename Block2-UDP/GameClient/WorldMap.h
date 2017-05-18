@@ -32,4 +32,5 @@ public:
 
 
 	void Draw(sf::RenderWindow &window);
+	Coordinate GetGridDisplacement();
 };

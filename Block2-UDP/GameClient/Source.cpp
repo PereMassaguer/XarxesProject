@@ -1,6 +1,5 @@
 #pragma once
-#include <PlayerInfo.h>
-#include <SFML\Network.hpp>
+//#include <PlayerInfo.h>
 
 #include "ConnectionManager.h"
 #include "WorldMap.h"
@@ -9,7 +8,7 @@
 int main()
 {
 	WorldMap worldMap;
-	PlayerInfo playerInfo;
+	//PlayerInfo playerInfo;
 
 	sf::Vector2i screenDimensions(WINDOW_X, WINDOW_Y);
 	sf::RenderWindow window;
@@ -25,14 +24,15 @@ int main()
 	instructions.setPosition(100, 100);
 
 
-	CM.Init('c');
+
+	Coordinate gridDisplacement = worldMap.GetGridDisplacement();
+
+
 
 	sf::Thread receiveMessage(&ConnectionManager::Recv, &CM);
-	receiveMessage.launch();
 
 	GameState gameState = GameState::NAME_INPUT;
 	sf::String msg;
-	bool waiting = false;
 	while (window.isOpen()) {
 		sf::Event event;
 
@@ -42,12 +42,18 @@ int main()
 				if (event.key.code == sf::Keyboard::Escape) window.close();
 				
 				if (event.key.code == sf::Keyboard::Return) {
-					if (gameState == GameState::NAME_INPUT && msg.getSize() >= 2 && !waiting) {
-						CM.Send("HELLO_" + name);
+					if (gameState == GameState::NAME_INPUT && msg.getSize() >= 2) {
+						CM.InitClient(name);
+						receiveMessage.launch();
 						instructions.setString("Waiting for connection confirmation");
-						waiting = true;
+						gameState = GAME_LOOP;
 					}
 				}
+				if (gameState == GAME_LOOP) {
+					if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::Left || event.key.code == sf::Keyboard::Right)
+						CM.Move(int(event.key.code));
+				}
+
 				break;
 
 			case sf::Event::TextEntered:
@@ -67,23 +73,26 @@ int main()
 			}
 		}
 
+		sf::CircleShape t(CELL_SIZE_X * 0.375);
 		switch (gameState)
 		{
 		case USER_CONNECTION:
 			break;
 		case NAME_INPUT:
-			if(!waiting) instructions.setString("Enter your name: " + name);
-			else {
-				if (CM.GetBuffer() != "") {
-					//Debug(CM.GetBuffer());
+			instructions.setString("Enter your name: " + name);
+			break;
+		case GAME_LOOP: {
+			std::vector<std::vector<Coordinate>> pCoords = CM.GetPlayersCoords();
+
+			t.setFillColor(sf::Color(C_BLUE));
+			for (int i = 0; i < pCoords.size(); i++) {
+				if (i > 0) t.setFillColor(sf::Color(C_RED));
+				for (auto it : pCoords[i]) {
+					t.setPosition((it.first + 0.5) * CELL_SIZE_X + gridDisplacement.first - t.getRadius(), (it.second + 0.5) * CELL_SIZE_Y + gridDisplacement.second - t.getRadius());
+					window.draw(t);
 				}
 			}
-			break;
-		case TROOP_DEPLOY:
-			break;
-		case BASE_DEPLOY:
-			break;
-		case GAME_LOOP:
+		}
 			break;
 		default:
 			break;

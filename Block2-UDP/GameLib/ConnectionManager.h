@@ -13,18 +13,11 @@
 #define CM ConnectionManager::Instance()
 class ConnectionManager
 {
-	struct Player {
-		int id;
-		std::string name;
-		Coordinate coord;
-		int lastConCheck;
-	};
-
 	char _buffer[BUFFER_SIZE];
 	sf::UdpSocket _socket;
 	ConnectionData _server;
 	std::map<ConnectionData, Player> _clients;
-	//std::vector<Player> _clients;
+	std::vector<Player> _players;
 	char _connectionType;
 
 
@@ -36,11 +29,16 @@ public:
 		return socketManager;
 	}
 	~ConnectionManager();
-	void Init(char connectionType);
+	void InitServer();
+	void InitClient(std::string name);
 	void Send(std::string str);
 	void Send(std::string str, ConnectionData recvData);
 	void Recv();
 
 	std::string GetBuffer();
 	void EraseBuffer();
+	Coordinate RandomFreeCoord();
+	Player CreatePlayer(std::string name);
+	std::vector<std::vector<Coordinate>> GetPlayersCoords();
+	void Move(int d);
 };

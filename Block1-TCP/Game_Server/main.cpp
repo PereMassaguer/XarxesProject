@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 
+#include "Funcs.h"
 #include "ID.h"
 #include "SocketManager.h"
 
@@ -20,7 +21,7 @@ int main()
 
 	GameState gameState = GameState::USER_CONNECTION;
 
-
+	
 	SM.ServerInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
@@ -46,7 +47,7 @@ int main()
 	while (!done) {
 		switch (gameState)
 		{
-		case USER_CONNECTION:
+		case USER_CONNECTION: {
 			for (int i = 0; i < players.size(); i++) {
 				std::string t = &(*(SM.getBuffer(i)));
 				if (t != "\0") {
@@ -60,6 +61,7 @@ int main()
 				}
 			}
 			break;
+		}
 
 		case NAME_INPUT:
 			//Set del nombre
@@ -83,8 +85,8 @@ int main()
 
 			break;
 
-		case TROOP_DEPLOY:
-			gameState = GameState::BASE_DEPLOY; 
+		case TROOP_DEPLOY: {
+			gameState = GameState::BASE_DEPLOY;
 			std::string t;
 			for (int i = 0; i < players.size(); i++) {
 				t = &(*(SM.getBuffer(i)));
@@ -93,7 +95,7 @@ int main()
 					t = t.substr(t.find('_') + 1, t.size());
 					int units = std::stoi(t.substr(0, t.find('_')));
 					std::cout << "Received " << units << " units from player: " << i << std::endl;
-					
+
 					for (int j = 0; j < units; j++) {
 						Coordinate tCoord;
 						t = t.substr(t.find('_') + 1, t.size());
@@ -125,7 +127,8 @@ int main()
 				SM.SendMessage(t, 0);
 			}
 			break;
-		case BASE_DEPLOY:
+		}
+		case BASE_DEPLOY: {
 			gameState = GameState::START_GAME;
 			std::string t;
 			for (int i = 0; i < players.size(); i++) {
@@ -165,9 +168,9 @@ int main()
 					t += "_" + std::to_string(it.first.second);
 				}
 				SM.SendMessage(t, 0);
-
 			}
 			break;
+		}
 
 		/*case START_GAME:
 			std::string t = "UnitSetup_" + std::to_string(players[1].units.size());

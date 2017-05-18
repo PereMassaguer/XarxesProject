@@ -20,7 +20,7 @@ int main()
 	std::vector<Player> _players;
 
 
-	CM.Init('s');
+	CM.InitServer();
 
 	sf::Thread receiveMessage(&ConnectionManager::Recv, &CM);
 	receiveMessage.launch();

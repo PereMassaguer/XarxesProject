@@ -7,7 +7,7 @@ Cell::Cell()
 	_perimeterWidth = 1;
 	elementID = ElementID::CLEAN;
 
-	sf::RectangleShape t(sf::Vector2f(CELL_SIZE_X, _perimeterWidth));
+	sf::RectangleShape t(sf::Vector2f(CELL_SIZE_X, 2));
 	t.setFillColor(sf::Color(C_WHITE));
 
 	_perimeter.push_back(t);
@@ -36,13 +36,13 @@ void Cell::SetPosition(Coordinate pos)
 	_perimeter[0].setPosition(_pos.first, _pos.second);
 
 	//Lower
-	_perimeter[1].setPosition(_pos.first, _pos.second + CELL_SIZE_Y - _perimeterWidth);
+	_perimeter[1].setPosition(_pos.first, _pos.second + CELL_SIZE_Y - _perimeterWidth / 2);
 
 	//Left
 	_perimeter[2].setPosition(_pos.first, _pos.second);
 
 	//Right
-	_perimeter[3].setPosition(_pos.first + CELL_SIZE_X - _perimeterWidth, _pos.second);
+	_perimeter[3].setPosition(_pos.first + CELL_SIZE_X - _perimeterWidth / 2, _pos.second);
 }
 
 void Cell::Draw(sf::RenderWindow &window)
