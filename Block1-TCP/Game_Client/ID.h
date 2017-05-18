@@ -49,3 +49,15 @@ enum ColorID {
 
 #define P_START Start_ //Send name
 #define P_SETUP Units_ //Send Nunits_, Xcoord_, Ycoord_(*Nunits) 
+
+
+
+std::string CoordToString(Coordinate c) {
+	return std::to_string(c.first) + "_" + std::to_string(c.second);
+}
+
+
+
+void Debug(std::string str) {
+	std::cout << str << std::endl;
+}

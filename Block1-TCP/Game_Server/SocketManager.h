@@ -2,17 +2,16 @@
 #include <SFML\Network.hpp>
 #include <iostream>
 #include <thread>
+#include "ID.h"
 
 #define CONNECT_PORT 5000
 
 #define SM SocketManager::Instance()
 class SocketManager
 {
-	sf::IpAddress ip;
-	char buffer[2][2000];
-
+	std::vector<Client> _clients;
+	
 	sf::TcpListener listener;
-	std::vector<sf::TcpSocket*> clientSockets;
 	sf::SocketSelector selector;
 
 public:

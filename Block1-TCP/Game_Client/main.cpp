@@ -139,10 +139,9 @@ int main()
 						_button.SetReady(false);
 						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
 						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
-						for (auto it : tCoord) {
-							t += "_" + std::to_string(it.first);
-							t += "_" + std::to_string(it.second);
-						}
+
+						for (auto it : tCoord) t += "_" + CoordToString(it);
+
 						SM.SendMessage(t);
 						waiting = true;
 					}
@@ -155,10 +154,9 @@ int main()
 						_button.SetReady(false);
 						std::vector<Coordinate> tCoord = worldMap.GetPlayerBasesCoords();
 						std::string t = "BaseSetup_" + std::to_string(tCoord.size());
-						for (auto it : tCoord) {
-							t += "_" + std::to_string(it.first);
-							t += "_" + std::to_string(it.second);
-						}
+
+						for (auto it : tCoord) t += "_" + CoordToString(it);
+
 						SM.SendMessage(t);
 						waiting = true;
 					}
@@ -171,16 +169,14 @@ int main()
 						_button.SetReady(false);
 						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
 						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
-						for (auto it : tCoord) {
-							t += "_" + std::to_string(it.first);
-							t += "_" + std::to_string(it.second);
-						}
+						
+						for (auto it : tCoord) t += "_" + CoordToString(it);
+
 						tCoord = worldMap.GetPlayerBasesCoords();
 						t += "BaseSetup_" + std::to_string(tCoord.size());
-						for (auto it : tCoord) {
-							t += "_" + std::to_string(it.first);
-							t += "_" + std::to_string(it.second);
-						}
+
+						for (auto it : tCoord) t += "_" + CoordToString(it);
+
 						SM.SendMessage(t);
 						waiting = true;
 						worldMap.SetMovementsLeft(PLAYER_UNIT);
