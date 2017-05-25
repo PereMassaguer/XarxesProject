@@ -11,7 +11,7 @@
 class SocketManager
 {
 	int idCounter;
-	std::vector<Client*> _clients;
+	std::vector<Client> _clients;
 
 	sf::TcpListener listener;
 	sf::SocketSelector selector;
@@ -25,16 +25,6 @@ public:
 		return socketManager;
 	}
 
-	void ServerInit();
+	void ServerInit(std::vector<Client> *clients);
 	void SocketReceive();
-	void SendMessage(std::string message);
-
-	void SendMessage(std::string message, int i);
-
-	void SendMessage(std::string message, sf::TcpSocket sock);
-
-	char* getBuffer(int i);
-	void EraseBuffer(int i);
-
-	void SayConnections();
 };

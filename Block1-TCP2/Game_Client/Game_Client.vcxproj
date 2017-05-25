@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{51A85D55-DF9C-48A6-A428-E8EA775B8902}</ProjectGuid>
+    <ProjectGuid>{99669371-7CA9-459D-A248-6F45625A6FD4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Game_Server</RootNamespace>
+    <RootNamespace>Game_Client</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -152,16 +152,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Lobby.cpp" />
+    <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="GUIButton.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SocketManager.cpp" />
+    <ClCompile Include="Unit.cpp" />
+    <ClCompile Include="WorldMap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h" />
+    <ClInclude Include="Cell.h" />
+    <ClInclude Include="GUIButton.h" />
     <ClInclude Include="ID.h" />
-    <ClInclude Include="Lobby.h" />
     <ClInclude Include="SocketManager.h" />
+    <ClInclude Include="Unit.h" />
+    <ClInclude Include="WorldMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

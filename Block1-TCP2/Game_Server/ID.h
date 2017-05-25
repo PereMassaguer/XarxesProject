@@ -58,11 +58,19 @@ struct Player {
 };
 
 struct Client {
-	bool playing;
+	bool playing = false;
 	sf::IpAddress ip;
 	sf::TcpSocket* socket;
 	char buffer[2000];
 	Player player;
+
+	std::string getBuffer() {
+		return buffer;
+	}
+
+	/*bool emptyBuffer() {
+		if(buffer == )
+	}*/
 };
 
 static std::string CoordToString(Coordinate c) {

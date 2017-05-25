@@ -1,9 +1,7 @@
 #pragma once
 #include <vector>
-#include <string>
-#include <SFML\Graphics.hpp>
-#include <SFML\Network.hpp>
 #include <iostream>
+
 
 #define MAP_COLUMNS 15
 #define MAP_ROWS 10
@@ -31,7 +29,6 @@ enum GameState {
 	NAME_INPUT,
 	TROOP_DEPLOY,
 	BASE_DEPLOY,
-	START_GAME,
 	GAME_LOOP
 };
 
@@ -50,30 +47,17 @@ enum ColorID {
 
 
 
-struct Player {
-	int id;
-	sf::Text name;
-	std::vector<std::pair<Coordinate, int>> units;
-	std::vector<std::pair<Coordinate, int>> base;
-};
 
-struct Client {
-	bool playing;
-	sf::IpAddress ip;
-	sf::TcpSocket* socket;
-	char buffer[2000];
-	Player player;
-};
+#define P_START Start_ //Send name
+#define P_SETUP Units_ //Send Nunits_, Xcoord_, Ycoord_(*Nunits) 
+
+
 
 static std::string CoordToString(Coordinate c) {
 	return std::to_string(c.first) + "_" + std::to_string(c.second);
 }
 
-static void StringToCoord(Coordinate &c, std::string &str) {
-	c.first = stoi(str.substr(0, str.find('_')));
-	str = str.substr(str.find('_') + 1, str.size());
-	c.second = stoi(str.substr(0, str.find('_')));
-}
+
 
 static void Debug(std::string str) {
 	std::cout << str << std::endl;

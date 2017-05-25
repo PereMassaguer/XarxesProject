@@ -2,19 +2,16 @@
 #include <SFML\Network.hpp>
 #include <iostream>
 #include <thread>
-#include "ID.h"
-#include "Game.h"
 
 #define CONNECT_PORT 5000
 
 #define SM SocketManager::Instance()
 class SocketManager
 {
-	int idCounter;
-	std::vector<Client*> _clients;
-
-	sf::TcpListener listener;
-	sf::SocketSelector selector;
+	sf::IpAddress ip;
+	char buffer[2000];
+	sf::TcpSocket socket;
+	sf::Socket::Status status;
 
 public:
 	SocketManager();
@@ -25,16 +22,14 @@ public:
 		return socketManager;
 	}
 
-	void ServerInit();
+
+	void ClientInit();
 	void SocketReceive();
 	void SendMessage(std::string message);
 
-	void SendMessage(std::string message, int i);
+	char* getBuffer();
+	void EraseBuffer();
 
-	void SendMessage(std::string message, sf::TcpSocket sock);
-
-	char* getBuffer(int i);
-	void EraseBuffer(int i);
-
-	void SayConnections();
+	sf::TcpSocket::Status GetConnectionStatus();
+	void Disconnect();
 };

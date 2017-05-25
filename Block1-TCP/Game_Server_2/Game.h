@@ -15,9 +15,4 @@ class Game
 public:
 	Game();
 	~Game();
-
-
-	void Run();
-	void ConnectClient(Player &player);
-	void ResolveCommand(std::string str);
 };

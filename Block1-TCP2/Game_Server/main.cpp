@@ -15,25 +15,33 @@
 
 int main()
 {
-	std::vector<std::string> aMensajes;
-
-	
-	SM.ServerInit();
+	std::vector<Client> _clients;
+	SM.ServerInit(&_clients);
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 
 
 	Game game;
+
+
+	bool done = false;
+	int i = 0;
+	while (!done) {
+		std::string str;
+		for (auto it : _clients) {
+			str = it.buffer;
+
+			if (str != "") {
+				if (str == "Hello") {
+					Debug(str);
+				}
+
+
+			}
+		}
+	}
 	
-
-	std::vector<Player> players;
-	Player tempPl, tempPl2;
-	tempPl.name.setString("\0");
-	tempPl2.name.setString("\0");
-	players.push_back(tempPl);
-	players.push_back(tempPl2);
-
 
 	
 	getClientMessage.terminate();
