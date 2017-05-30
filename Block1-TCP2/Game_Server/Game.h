@@ -4,11 +4,10 @@
 
 class Game
 {
+	std::vector<Player*> _players;
+
 	GameState _gameState;
 
-	std::vector<Player> _players;
-
-	int _playerCounter;
 	bool _playsA;
 	bool _done;
 
@@ -16,8 +15,9 @@ public:
 	Game();
 	~Game();
 
+	int players;
 
-	void Run();
-	void ConnectClient(Player &player);
-	void ResolveCommand(std::string str);
+	//void Run();
+	void AddPlayer(Player * player);
+	void RunCommand(int playerId, std::string com);
 };

@@ -2,21 +2,68 @@
 
 Game::Game() {
 	_gameState = GameState::USER_CONNECTION;
-	_playerCounter = 0;
 	_playsA = true;
 	_done = false;
+	players = 0;
+	
 }
-
-
 
 
 Game::~Game() {
 
 }
 
-void Game::Run()
+/*void Game::Run()
 {
 	while (true) {
+		for (auto it : _clients) {
+			std::string str = it->GetBuffer();
+			//it.playing = true;
+			if (str != "") {
+				if (str == "SURRENDER") {
+					Debug("surrendering");
+				}
+			}
+		}
+	}
+}*/
+
+/*
+void Game::AddClient(Client * client)
+{
+	client->playing = true;
+	_clients.push_back(client);
+	Debug("Client added successfully");
+}*/
+
+
+void Game::AddPlayer(Player * player)
+{
+	_players.push_back(player);
+	Debug("Player added successfully");
+}
+
+
+void Game::RunCommand(int playerId, std::string com) {
+	Debug("Received command: " + com);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 		for (int i = 0; i < _players.size(); i++) {
 			std::string str = &(*(SM.getBuffer(_players[i].id)));
 			SM.EraseBuffer(_players[i].id);
@@ -154,16 +201,4 @@ void Game::Run()
 					}
 				}
 			}
-		}
-	}
-}
-
-void Game::ConnectClient(Player & player)
-{
-	_players.push_back(player);
-}
-
-void Game::ResolveCommand(std::string str)
-{
-	
-}
+			}*/

@@ -58,14 +58,29 @@ struct Player {
 };
 
 struct Client {
-	bool playing = false;
+	bool playing;
 	sf::IpAddress ip;
 	sf::TcpSocket* socket;
 	char buffer[2000];
 	Player player;
 
-	std::string getBuffer() {
+	Client() {
+		playing = false;
+		EraseBuffer();
+		player.id = -1;
+	}
+
+	Client(int id, sf::TcpSocket* s):Client(){
+		player.id = id;
+		socket = s;
+	}
+
+	std::string GetBuffer() {
 		return buffer;
+	}
+
+	void EraseBuffer() {
+		strcpy_s(buffer, "\0");
 	}
 
 	/*bool emptyBuffer() {

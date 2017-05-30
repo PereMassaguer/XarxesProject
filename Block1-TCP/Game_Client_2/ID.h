@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <iostream>
 
 #define MAP_COLUMNS 15
@@ -52,12 +53,12 @@ enum ColorID {
 
 
 
-std::string CoordToString(Coordinate c) {
+static std::string CoordToString(Coordinate c) {
 	return std::to_string(c.first) + "_" + std::to_string(c.second);
 }
 
 
 
-void Debug(std::string str) {
+static void Debug(std::string str) {
 	std::cout << str << std::endl;
 }

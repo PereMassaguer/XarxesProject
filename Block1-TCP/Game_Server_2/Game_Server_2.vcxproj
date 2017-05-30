@@ -153,14 +153,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Lobby.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SocketManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="ID.h" />
-    <ClInclude Include="Lobby.h" />
     <ClInclude Include="SocketManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

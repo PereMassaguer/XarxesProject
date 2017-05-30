@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SFML\Graphics.hpp>
 #include <SFML\Network.hpp>
 #include <string>
 #include <cstring>
@@ -243,5 +244,5 @@ int main()
 	std::cout << "Connection stopped" << std::endl;
 	//system("pause");
 
-	return 0;	
+	return 0;
 }

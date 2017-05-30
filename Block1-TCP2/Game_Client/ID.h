@@ -25,6 +25,7 @@ enum ElementID {
 
 
 enum GameState {
+	LOBBY, 
 	USER_CONNECTION,
 	NAME_INPUT,
 	TROOP_DEPLOY,

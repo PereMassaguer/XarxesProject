@@ -22,10 +22,9 @@ int main()
 
 
 	std::vector<Client> _clients;
-	//SM.ServerInit(&_clients);
-	int i = 1;
-	while (i < 0) {
-		i++;
+	SM.ServerInit(&_clients);
+	while (true) {
+
 	}
 
 	getClientMessage.terminate();

@@ -32,7 +32,7 @@ public:
 
 	void SendMessage(std::string message, int i);
 
-	void SendMessage(std::string message, sf::TcpSocket sock);
+	void SendMessage(std::string message, sf::TcpSocket *sock);
 
 	char* getBuffer(int i);
 	void EraseBuffer(int i);

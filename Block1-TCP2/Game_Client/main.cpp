@@ -20,12 +20,22 @@ int main()
 	window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Client");
 	window.setPosition(sf::Vector2i(0, 200));
 
-	WorldMap worldMap;
-	GUIButton _button(Coordinate(450, 600));
-
-
 	sf::Font font;
 	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
+
+	WorldMap worldMap;
+	GUIButton _button(Coordinate(450, 600));
+	GUIButton _button2(Coordinate(450, 450));
+	GUIButton _CreateGame(Coordinate(650, 125));
+	_CreateGame.SetReady(true);
+
+	sf::Text createGameT("Create new game", font, 24);
+	createGameT.setFillColor(sf::Color(255, 255, 255));
+	createGameT.setStyle(sf::Text::Bold);
+	createGameT.setPosition(525, 150);
+
+
+
 
 
 	sf::String mensaje;
@@ -60,7 +70,7 @@ int main()
 	opponent.name = auxText;
 
 	auxText.setString("Write your name");
-	auxText.setPosition(25, window.getSize().y - 55);
+	auxText.setPosition(window.getSize().x - 250, 50);
 	user.name = auxText;
 
 	auxText.setString("0");
@@ -72,17 +82,38 @@ int main()
 	opponent.score = auxText;
 
 
-
 	texts.push_back(&user.name);
-	texts.push_back(&opponent.name);
+	//texts.push_back(&opponent.name);
 	
+
+	sf::Text lobby("Lobby", font, 40);
+	lobby.setFillColor(sf::Color(255, 255, 255));
+	lobby.setStyle(sf::Text::Bold);
+	lobby.setPosition(100, 50);
+
+
+	sf::Text gamelistT("Game list", font, 30);
+	gamelistT.setFillColor(sf::Color(255, 255, 255));
+	gamelistT.setStyle(sf::Text::Bold);
+	gamelistT.setPosition(125, 150);
+
+
+
+	texts.push_back(&gamelistT);
+	texts.push_back(&lobby);
+	texts.push_back(&createGameT);
+
+	std::vector<sf::Text> gameList;
+
+
+
 	SM.ClientInit();
 
 	sf::Thread getClientMessage(&SocketManager::SocketReceive, &SM);
 	getClientMessage.launch();
 	
 
-	GameState gameState = GameState::USER_CONNECTION;
+	GameState gameState = GameState::NAME_INPUT;
 	SM.SendMessage("Hello");
 
 
@@ -122,65 +153,11 @@ int main()
 
 			case sf::Event::MouseButtonPressed:
 
-				if (gameState == GameState::NAME_INPUT) {
-					if (_button.CheckActivated(evento.mouseButton)) {
-						_button.SetReady(false);
-						std::string t = "Start_";
-						t += user.name.getString();
-						SM.SendMessage(t);
-						waiting = true;
-					}
+				if (_button2.CheckActivated(evento.mouseButton)) {
+					SM.SendMessage("Exit");
 				}
-
-				if (gameState == GameState::TROOP_DEPLOY) {
-					worldMap.ActivateCell(evento.mouseButton, gameState);
-					_button.SetReady(worldMap.GetPlayerUnits() == 3 ? true : false);
-					if (_button.CheckActivated(evento.mouseButton)) {
-						_button.SetReady(false);
-						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
-						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
-
-						for (auto it : tCoord) t += "_" + CoordToString(it);
-
-						SM.SendMessage(t);
-						waiting = true;
-					}
-				}				
-
-				if (gameState == GameState::BASE_DEPLOY) {
-					worldMap.ActivateCell(evento.mouseButton, gameState);
-					_button.SetReady(worldMap.GetPlayerBases() == 2 ? true : false);
-					if (_button.CheckActivated(evento.mouseButton)) {
-						_button.SetReady(false);
-						std::vector<Coordinate> tCoord = worldMap.GetPlayerBasesCoords();
-						std::string t = "BaseSetup_" + std::to_string(tCoord.size());
-
-						for (auto it : tCoord) t += "_" + CoordToString(it);
-
-						SM.SendMessage(t);
-						waiting = true;
-					}
-				}
-
-				if (gameState == GameState::GAME_LOOP && !waiting) {
-					worldMap.ActivateCell(evento.mouseButton, gameState);
-					_button.SetReady(true);
-					if (_button.CheckActivated(evento.mouseButton)) {
-						_button.SetReady(false);
-						std::vector<Coordinate> tCoord = worldMap.GetPlayerUnitsCoords();
-						std::string t = "UnitSetup_" + std::to_string(tCoord.size());
-						
-						for (auto it : tCoord) t += "_" + CoordToString(it);
-
-						tCoord = worldMap.GetPlayerBasesCoords();
-						t += "BaseSetup_" + std::to_string(tCoord.size());
-
-						for (auto it : tCoord) t += "_" + CoordToString(it);
-
-						SM.SendMessage(t);
-						waiting = true;
-						worldMap.SetMovementsLeft(PLAYER_UNIT);
-					}
+				if (_CreateGame.CheckActivated(evento.mouseButton)) {
+					SM.SendMessage("Create");
 				}
 
 				break;
@@ -195,6 +172,33 @@ int main()
 		std::string t = &(*(SM.getBuffer()));
 		if (*(SM.getBuffer()) != '\0') {
 			std::cout << t << std::endl;
+
+			if (t.substr(0, t.find("_")) == "GAMELIST") {
+				t = t.substr(t.find("_") + 1, t.size());
+
+				int gamesN = stoi(t.substr(0, t.find("_")));
+
+				if (gamesN > 0) {
+					t = t.substr(t.find("_"), t.size());
+
+					for (int i = 0; i < gamesN; i++) {
+						t = t.substr(t.find("_") + 1, t.size());
+						sf::String lobbyId = t.substr(0, t.find("_"));
+						t = t.substr(t.find("_") + 1, t.size());
+						sf::String playerN = t.substr(0, t.find("_"));
+
+						sf::Text text("Lobby Number id: " + lobbyId + "		" + playerN + "/2", font, 30);
+
+						text.setFillColor(sf::Color(255, 255, 255));
+						text.setStyle(sf::Text::Bold);
+						text.setPosition(125, 200 + i * 35);
+
+						gameList.push_back(text);
+					}
+				}
+			}
+
+
 			switch (gameState)
 			{
 			case USER_CONNECTION:
@@ -206,28 +210,17 @@ int main()
 				gameState = GameState::TROOP_DEPLOY;
 				waiting = false;
 				break;
-			case TROOP_DEPLOY:
-				worldMap.SetEnemyUnits(t);
-				gameState = GameState::BASE_DEPLOY;
-				waiting = false;
-				break;
-			case BASE_DEPLOY:
-				worldMap.SetEnemyBases(t);
-				gameState = GameState::GAME_LOOP;
-				break;
-			case GAME_LOOP:
-				worldMap.SetEnemyData(t);
-				waiting = false;
-				break;
 			default:
 				break;
 			}
 			SM.EraseBuffer();
 		}
 
-		worldMap.Draw(window);
+		//worldMap.Draw(window);
+		//_button.Draw(window);
+		_button2.Draw(window);
+		_CreateGame.Draw(window);
 		for (auto it : texts) window.draw(*it);
-		_button.Draw(window);
 
 
 		window.display();

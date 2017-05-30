@@ -28,7 +28,7 @@ GUIButton::GUIButton(Coordinate pos) : GUIButton()
 	_message.setStyle(sf::Text::Bold);
 	_message.setPosition(sf::Vector2f(100, 625));
 	
-	sf::RectangleShape t(sf::Vector2f(_pos.first, _perimeterWidth));
+	sf::RectangleShape t(sf::Vector2f(_size.first, _perimeterWidth));
 	t.setFillColor(sf::Color(C_WHITE));
 
 	//Upper

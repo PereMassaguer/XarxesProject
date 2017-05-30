@@ -44,7 +44,7 @@ void SocketManager::SocketReceive() {
 					tClient.playing = false;
 					_clients.push_back(tClient);
 					selector.add(*client);
-					std::cout << "New client connected: ";
+					std::cout << "New client connected: " ;
 				}
 				else { 
 					delete client; 
