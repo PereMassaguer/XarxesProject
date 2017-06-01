@@ -10,6 +10,7 @@ class GUIButton
 	sf::Text _message;
 	sf::RectangleShape _backGround;
 	sf::Color _color;
+	sf::Font font;
 		
 	Coordinate _pos;
 	Coordinate _size;
@@ -20,7 +21,8 @@ class GUIButton
 
 public:
 	GUIButton();
-	GUIButton(Coordinate pos);
+	GUIButton(Coordinate pos, Coordinate size);
+	GUIButton(sf::String str, Coordinate pos, Coordinate size);
 	~GUIButton();
 
 	void Draw(sf::RenderWindow & window);

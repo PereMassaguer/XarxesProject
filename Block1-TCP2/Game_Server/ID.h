@@ -63,11 +63,13 @@ struct Client {
 	sf::TcpSocket* socket;
 	char buffer[2000];
 	Player player;
+	int gameID;
 
 	Client() {
 		playing = false;
 		EraseBuffer();
 		player.id = -1;
+		gameID = -1;
 	}
 
 	Client(int id, sf::TcpSocket* s):Client(){

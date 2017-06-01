@@ -4,10 +4,12 @@ Game::Game() {
 	_gameState = GameState::USER_CONNECTION;
 	_playsA = true;
 	_done = false;
-	players = 0;
-	
+	players = 0;	
 }
 
+Game::Game(int maxP) : Game(){
+	maxPlayers = maxP;
+}
 
 Game::~Game() {
 
@@ -41,6 +43,7 @@ void Game::AddPlayer(Player * player)
 {
 	_players.push_back(player);
 	Debug("Player added successfully");
+	players++;
 }
 
 

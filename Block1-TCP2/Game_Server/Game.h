@@ -13,9 +13,11 @@ class Game
 
 public:
 	Game();
+	Game(int maxP);
 	~Game();
 
 	int players;
+	int maxPlayers;
 
 	//void Run();
 	void AddPlayer(Player * player);

@@ -4,29 +4,27 @@
 
 GUIButton::GUIButton()
 {
-	_size = Coordinate(300, 75);
 	_perimeterWidth = 5;
 	SetReady(false);
+
+	SetColor();
+	
+	if (!font.loadFromFile("courbd.ttf")) std::cout << "Can't load the font file" << std::endl;
+	_message = sf::Text("", font, 24);
+	_message.setFillColor(sf::Color(255, 255, 255));
+	_message.setStyle(sf::Text::Bold);
 }
 
 #include <iostream>
-GUIButton::GUIButton(Coordinate pos) : GUIButton()
+GUIButton::GUIButton(Coordinate pos, Coordinate size) : GUIButton()
 {
 	_pos = pos;
-	_pos.first -= _size.first / 2;
+	_size = size;
 
 
 	_backGround.setPosition(sf::Vector2f(_pos.first, _pos.second));
 	_backGround.setSize(sf::Vector2f(_size.first, _size.second));
-	SetColor();
-
-
-	sf::Font font;
-	if (!font.loadFromFile("courbd.ttf"))
-	_message = sf::Text("trydfgsdghgsfjhmf", font, 24);
-	_message.setFillColor(sf::Color(0, 160, 0));
-	_message.setStyle(sf::Text::Bold);
-	_message.setPosition(sf::Vector2f(100, 625));
+	_message.setPosition(sf::Vector2f(_pos.first + _size.first / 2, _pos.second + _size.second/2));
 	
 	sf::RectangleShape t(sf::Vector2f(_size.first, _perimeterWidth));
 	t.setFillColor(sf::Color(C_WHITE));
@@ -36,24 +34,31 @@ GUIButton::GUIButton(Coordinate pos) : GUIButton()
 	_perimeter.push_back(t);
 
 	//Lower
-	t.setPosition(_pos.first, _pos.second + _size.second - _perimeterWidth);
+	t.setOrigin(0, -_size.second + _perimeterWidth);
 	_perimeter.push_back(t);
 
 	//Left
 	t.setSize(sf::Vector2f(_perimeterWidth, _size.second));
-	t.setPosition(_pos.first, _pos.second);
+	t.setOrigin(0, 0);
 	_perimeter.push_back(t);
 
 	//Right
-	t.setPosition(_pos.first + _size.first - _perimeterWidth, _pos.second);
+	t.setOrigin(-_size.first + _perimeterWidth, 0);
 	_perimeter.push_back(t);
+}
+
+GUIButton::GUIButton(sf::String str, Coordinate pos, Coordinate size) : GUIButton(pos, size) {
+	_message.setString(str);
+	sf::FloatRect textRect = _message.getLocalBounds();
+	_message.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 }
 
 void GUIButton::Draw(sf::RenderWindow &window)
 {
 	window.draw(_backGround);
-	for (auto &it : _perimeter) window.draw(it);
-	window.draw(_message);
+	for (auto it : _perimeter) window.draw(it);
+
+	if (_message.getString().toAnsiString() != "") window.draw(_message);
 }
 
 bool GUIButton::Moused(sf::Event::MouseButtonEvent mouse)

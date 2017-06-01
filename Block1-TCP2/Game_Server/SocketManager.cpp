@@ -60,16 +60,23 @@ void SocketManager::SocketReceive() {
 				}
 			}
 			else {
-				std::vector<Client*> eraseList;
+				std::vector<int> eraseList;
+				int i = 0;
 				for (auto &it : *_clients) {
 					if (selector.isReady(*it.socket)) {
 						sf::TcpSocket::Status st = it.socket->receive(&it.buffer, sizeof(it.buffer), bytesReceived);
 						
 						if (st == sf::TcpSocket::Disconnected) {
-							std::cout << "Client disconnected, ";
-							eraseList.push_back(&it);
+							std::cout << "Client disconnected" << std::endl;
+							eraseList.push_back(i);							
 						}
 					}
+					i++;
+				}
+				for (int i = eraseList.size() - 1; i >= 0; i--)
+				{
+					_clients->at(eraseList[i]).socket->disconnect();
+					_clients->erase(_clients->begin() + eraseList[i]);
 				}
 				eraseList.clear(); SayConnections();
 			}

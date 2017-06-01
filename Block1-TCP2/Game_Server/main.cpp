@@ -36,13 +36,10 @@ int main()
 		for(int i = 0; i < _clients.size() ;i++){
 			std::string str;
 			cl = &_clients[i];
-			if (cl->playing == true) break;
 
 			str = cl->buffer;
-			cl->EraseBuffer();
 
 			if (str != "") {
-				cl->playing = true;
 				Debug(str);
 				if (str == "Hello") {
 					std::string send = "GAMELIST_";
@@ -50,44 +47,55 @@ int main()
 					for (auto it : _games) {
 						send += "_" + std::to_string(it.first);
 						send += "_" + std::to_string(it.second.players);
+						send += "_" + std::to_string(it.second.maxPlayers);
 					}
 					SM.SendMessage(send, cl->socket);
 				}
-				if (str == "Create") {
-					_games.insert(std::make_pair(_gameIdCounter++, Game()));
+				if (str.substr(0, str.find("_")) == "Create") {
+					_games.insert(std::make_pair(_gameIdCounter, Game(stoi(str.substr(str.find("_") + 1, str.size())))));
 
 					std::map<int, Game>::iterator it;
 					it = _games.find(_gameIdCounter);
 					it->second.AddPlayer(&cl->player);
-					cl->playing = true;
+					cl->gameID = _gameIdCounter;
+
 
 					SM.SendMessage("Create_OK", cl->socket);
 
-					//it->second.RunCommand(cl.player.id, str);
+					_gameIdCounter++;
 				}
-				if (str == "Exit") {
+				if (str.substr(0, str.find("_")) == "MSG") {
+					for (auto it : _clients) {
+						if(it.gameID == cl->gameID)
+							SM.SendMessage("MSG_" + cl->player.name.getString() + ": " + str.substr(str.find("_") + 1, str.size()), it.socket);
+					}					
+				}
 
+				if (str == "FINISH") {
+					for (auto it : _clients) {
+						if (it.gameID == cl->gameID && cl->player.id != it.player.id)
+							SM.SendMessage("Finish", it.socket);
+						it.gameID = -1;
+					}
+					_games.erase(cl->gameID);
 				}
+
+				if (str.substr(0, str.find("_")) == "Join") {
+					int gameID = stoi(str.substr(str.find("_") + 1, str.size()));
+					std::map<int, Game>::iterator it = _games.find(gameID);
+					
+					if (it->second.players < it->second.maxPlayers) {
+						cl->gameID = gameID;
+						it->second.AddPlayer(&cl->player);
+						SM.SendMessage("JOIN_OK", cl->socket);
+					}
+					else {
+						SM.SendMessage("JOIN_FAIL", cl->socket);
+					}
+				}
+				cl->EraseBuffer();
 			}
 		}
-
-
-		/*if (_clients.size() > 0) {
-			i++;
-		}
-		for (auto it : _clients) {
-			if (it.playing == true) break;
-
-			str = it.buffer;
-
-			if (str != "") {
-				if (str == "Hello") {
-					Debug(str);
-					_games.AddClient(it);
-				}
-
-			}
-		}*/
 	}
 
 	getClientMessage.terminate();
